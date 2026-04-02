@@ -1,4 +1,4 @@
-# 🎲 D&D Character Manager - Модуль управления персонажами
+# D&D Character Manager - Модуль управления персонажами
 
 <div align="center">
 
