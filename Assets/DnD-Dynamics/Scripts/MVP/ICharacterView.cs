@@ -1,16 +1,12 @@
-using UnityEngine;
+using System;
+using System.Collections.Generic;
 
-public class ICharacterView : MonoBehaviour
+public interface ICharacterView
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    void DisplayCharacters(List<CharacterUIData> characters);
+    void DisplayCharacterDetails(CharacterUIData character);
+    void ShowError(string message);
+    void ShowSuccess(string message);
+    void ShowLoading(bool show);
+    void ClearSelection();
 }

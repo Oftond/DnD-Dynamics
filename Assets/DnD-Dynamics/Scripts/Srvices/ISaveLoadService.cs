@@ -1,16 +1,14 @@
-using UnityEngine;
+using System.Collections.Generic;
 
-public class ISaveLoadService : MonoBehaviour
+public interface ISaveLoadService
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    void SaveCharacters(List<CharacterData> characters);
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    List<CharacterData> LoadCharacters();
+
+    void SaveCharacter(CharacterData character);
+
+    void DeleteCharacter(string characterId);
+
+    bool HasSavedData();
 }

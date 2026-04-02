@@ -1,16 +1,14 @@
-using UnityEngine;
+using System.Collections.Generic;
 
-public class IDataService : MonoBehaviour
+public interface IDataService
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    void Save<T>(string key, T data);
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    T Load<T>(string key, T defaultValue = default);
+
+    bool Exists(string key);
+
+    void Delete(string key);
+
+    List<string> GetAllKeys();
 }
