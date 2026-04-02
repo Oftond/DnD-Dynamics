@@ -64,6 +64,8 @@ public class CharacterListWindow : MonoBehaviour, ICharacterView
 
         var characters = _presenter.GetAllCharacters();
         UpdateCharacterList(characters);
+
+        ShowEmptyState(characters.Count == 0);
     }
 
     public void Show()

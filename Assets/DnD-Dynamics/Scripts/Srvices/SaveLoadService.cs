@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEditor.Overlays;
 using UnityEngine;
 
 public class SaveLoadService : ISaveLoadService
@@ -12,7 +13,22 @@ public class SaveLoadService : ISaveLoadService
     {
         try
         {
-            var json = JsonUtility.ToJson(new Wrapper<List<CharacterData>> { Items = characters }, true);
+            var saveData = new SaveData();
+
+            foreach (var character in characters)
+            {
+                saveData.characters.Add(SerializableCharacterData.FromCharacter(character));
+            }
+
+            saveData.saveDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+            foreach (var character in characters)
+            {
+                Debug.Log($"  Saving: ID={character.Id}, Name={character.Name}, Level={character.Level}, HP={character.CurrentHp}/{character.MaxHp}");
+            }
+
+            string json = JsonUtility.ToJson(saveData, true);
+
             File.WriteAllText(SavePath, json);
             Debug.Log($"Сохранено {characters.Count} персонажей в {SavePath}");
         }
@@ -33,10 +49,23 @@ public class SaveLoadService : ISaveLoadService
             }
 
             var json = File.ReadAllText(SavePath);
-            var wrapper = JsonUtility.FromJson<Wrapper<List<CharacterData>>>(json);
+            var saveData = JsonUtility.FromJson<SaveData>(json);
 
-            Debug.Log($"Загружено {wrapper?.Items?.Count ?? 0} персонажей");
-            return wrapper?.Items ?? new List<CharacterData>();
+            if (saveData?.characters == null)
+                return new List<CharacterData>();
+
+            var characters = new List<CharacterData>();
+            foreach (var serializable in saveData.characters)
+            {
+                characters.Add(serializable.ToCharacter());
+            }
+
+            foreach (var character in characters)
+            {
+                Debug.Log($"  Loaded: ID={character.Id}, Name={character.Name}, Level={character.Level}, HP={character.CurrentHp}/{character.MaxHp}");
+            }
+
+            return characters;
         }
         catch (Exception ex)
         {
@@ -74,9 +103,12 @@ public class SaveLoadService : ISaveLoadService
         return File.Exists(SavePath);
     }
 
-    [Serializable]
-    private class Wrapper<T>
+    public void ClearSave()
     {
-        public T Items;
+        if (File.Exists(SavePath))
+        {
+            File.Delete(SavePath);
+            Debug.Log($"Save file deleted: {SavePath}");
+        }
     }
 }
