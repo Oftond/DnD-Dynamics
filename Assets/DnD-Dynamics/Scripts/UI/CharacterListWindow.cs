@@ -52,6 +52,20 @@ public class CharacterListWindow : MonoBehaviour, ICharacterView
             backButton.onClick.AddListener(() => OnBackClicked?.Invoke());
     }
 
+    public void RefreshCharacters()
+    {
+        Debug.Log("Refreshing character list");
+
+        if (_presenter == null)
+        {
+            Debug.LogError("Presenter is null in CharacterListWindow!");
+            return;
+        }
+
+        var characters = _presenter.GetAllCharacters();
+        UpdateCharacterList(characters);
+    }
+
     public void Show()
     {
         gameObject.SetActive(true);
@@ -139,5 +153,23 @@ public class CharacterListWindow : MonoBehaviour, ICharacterView
 
         if (emptyStateText != null && show)
             emptyStateText.text = "У вас пока нет персонажей.\nНажмите кнопку 'Создать' чтобы начать";
+        else if (emptyStateText != null && !show)
+            emptyStateText.text = "";
+    }
+
+    private void UpdateCharacterList(List<CharacterUIData> characters)
+    {
+        foreach (var item in _characterItems.Values)
+        {
+            Destroy(item);
+        }
+        _characterItems.Clear();
+
+        foreach (var character in characters)
+        {
+            AddCharacterItem(character);
+        }
+
+        Debug.Log($"Character list updated: {characters.Count} characters");
     }
 }

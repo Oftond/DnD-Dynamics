@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public static class Constants
 {
     public const string SAVE_KEY_CHARACTERS = "characters";
@@ -16,11 +18,11 @@ public static class Constants
 
     public const int MAX_LEVEL = 20;
 
-    public static readonly UnityEngine.Color PrimaryColor = new UnityEngine.Color(0.32f, 0.27f, 0.83f); // #512BD4
-    public static readonly UnityEngine.Color SecondaryColor = new UnityEngine.Color(0.17f, 0.07f, 0.25f); // #2B0B3F
-    public static readonly UnityEngine.Color SuccessColor = new UnityEngine.Color(0.06f, 0.72f, 0.51f); // #10B981
-    public static readonly UnityEngine.Color DangerColor = new UnityEngine.Color(0.94f, 0.27f, 0.27f); // #EF4444
-    public static readonly UnityEngine.Color WarningColor = new UnityEngine.Color(0.96f, 0.53f, 0.11f); // #F59E0B
+    public static readonly Color PrimaryColor = new Color(0.32f, 0.27f, 0.83f);
+    public static readonly Color SecondaryColor = new Color(0.17f, 0.07f, 0.25f);
+    public static readonly Color SuccessColor = new Color(0.06f, 0.72f, 0.51f);
+    public static readonly Color DangerColor = new Color(0.94f, 0.27f, 0.27f);
+    public static readonly Color WarningColor = new Color(0.96f, 0.53f, 0.11f);
 
     public const float ANIMATION_DURATION = 0.3f;
 

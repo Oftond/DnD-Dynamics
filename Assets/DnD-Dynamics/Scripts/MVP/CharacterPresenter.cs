@@ -16,6 +16,11 @@ public class CharacterPresenter
         _model.OnCharacterUpdated += OnCharacterUpdated;
     }
 
+    public List<CharacterUIData> GetAllCharacters()
+    {
+        return _model.GetAllCharacters();
+    }
+
     public void SetView(ICharacterView view)
     {
         _view = view;

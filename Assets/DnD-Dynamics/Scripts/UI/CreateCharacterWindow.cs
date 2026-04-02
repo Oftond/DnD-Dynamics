@@ -7,17 +7,17 @@ using UnityEngine.UI;
 public class CreateCharacterWindow : MonoBehaviour
 {
     [Header("Character Info")]
-    [SerializeField] private InputField nameInput;
-    [SerializeField] private Dropdown raceDropdown;
-    [SerializeField] private Dropdown classDropdown;
+    [SerializeField] private TMP_InputField nameInput;
+    [SerializeField] private TMP_Dropdown raceDropdown;
+    [SerializeField] private TMP_Dropdown classDropdown;
 
     [Header("Stats")]
-    [SerializeField] private InputField strengthInput;
-    [SerializeField] private InputField dexterityInput;
-    [SerializeField] private InputField constitutionInput;
-    [SerializeField] private InputField intelligenceInput;
-    [SerializeField] private InputField wisdomInput;
-    [SerializeField] private InputField charismaInput;
+    [SerializeField] private TMP_InputField strengthInput;
+    [SerializeField] private TMP_InputField dexterityInput;
+    [SerializeField] private TMP_InputField constitutionInput;
+    [SerializeField] private TMP_InputField intelligenceInput;
+    [SerializeField] private TMP_InputField wisdomInput;
+    [SerializeField] private TMP_InputField charismaInput;
 
     [Header("Buttons")]
     [SerializeField] private Button createButton;
@@ -111,7 +111,7 @@ public class CreateCharacterWindow : MonoBehaviour
         }
     }
 
-    private int GetStatValue(InputField input, int defaultValue)
+    private int GetStatValue(TMP_InputField input, int defaultValue)
     {
         if (input != null && int.TryParse(input.text, out int value))
         {

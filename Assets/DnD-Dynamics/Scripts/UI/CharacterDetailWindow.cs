@@ -15,7 +15,7 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterView
     [SerializeField] private TextMeshProUGUI hpText;
     [SerializeField] private TextMeshProUGUI hpFractionText;
     [SerializeField] private Slider hpSlider;
-    [SerializeField] private InputField damageHealInput;
+    [SerializeField] private TMP_InputField damageHealInput;
     [SerializeField] private Button damageButton;
     [SerializeField] private Button healButton;
 
@@ -203,7 +203,6 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterView
         if (proficiencyText != null)
             proficiencyText.text = _currentCharacter.ProficiencyText;
 
-        // Валюта
         if (goldText != null)
             goldText.text = _currentCharacter.Gold.ToString();
 
@@ -213,7 +212,6 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterView
         if (copperText != null)
             copperText.text = _currentCharacter.Copper.ToString();
 
-        // Текстовая информация
         if (backstoryText != null)
             backstoryText.text = string.IsNullOrEmpty(_currentCharacter.Backstory)
                 ? "История не указана" : _currentCharacter.Backstory;

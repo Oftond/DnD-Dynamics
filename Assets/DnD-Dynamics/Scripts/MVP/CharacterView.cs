@@ -102,7 +102,7 @@ public class CharacterView : MonoBehaviour, ICharacterView
 
     private void ShowEmptyState(bool show)
     {
-        // Можно добавить пустое состояние
+
     }
 
     private void HideError()
