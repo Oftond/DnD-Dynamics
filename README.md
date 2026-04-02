@@ -84,3 +84,9 @@ https://unity.com/download
 #    Windows Build Support
 
 # 7. Дождитесь завершения установки
+
+### 4.2 Клонирование репозитория
+```bash
+git clone https://github.com/Oftond/DnD-Dynamics
+
+### 4.3 Запустить Unity Hub и добавить папку с файлами со скаченного репозитория
