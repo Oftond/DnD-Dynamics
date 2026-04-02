@@ -1,4 +1,7 @@
 using System;
+using System.Diagnostics;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 [Serializable]
 public class CharacterData
@@ -99,7 +102,9 @@ public class CharacterData
 
         if (amount > 0)
         {
+            Debug.Log($"ТЕКУЩЕЕ ЗДОРОВЬЕ: {CurrentHp}");
             CurrentHp = Math.Max(0, CurrentHp - amount);
+            Debug.Log($"ТЕКУЩЕЕ ЗДОРОВЬЕ: {CurrentHp}");
         }
 
         UpdatedAt = DateTime.Now;
@@ -250,7 +255,7 @@ public class CharacterUIData
     public string WisdomText => $"{Wisdom} ({WisdomModifier:+0;-0;0})";
     public string CharismaText => $"{Charisma} ({CharismaModifier:+0;-0;0})";
 
-    public string ArmorClassText => $"КБ: {ArmorClass}";
+    public string ArmorClassText => $"КД: {ArmorClass}";
     public string InitiativeText => $"Инициатива: {InitiativeBonus:+0;-0;0}";
-    public string ProficiencyText => $"Бонус владения: +{ProficiencyBonus}";
+    public string ProficiencyText => $"Бонус умения: +{ProficiencyBonus}";
 }

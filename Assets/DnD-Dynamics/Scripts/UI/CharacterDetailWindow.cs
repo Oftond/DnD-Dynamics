@@ -51,7 +51,6 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterView
     [SerializeField] private GameObject loadingSpinner;
 
     private CharacterPresenter _presenter;
-    private CharacterUIData _currentCharacter;
 
     public event Action OnBackClicked;
     public event Action<int> OnDamageClicked;
@@ -63,13 +62,27 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterView
     public void Initialize()
     {
         if (damageButton != null)
-            damageButton.onClick.AddListener(() => OnDamageClicked?.Invoke(GetDamageHealAmount()));
+            damageButton.onClick.AddListener(() =>
+            {
+                var test = GetDamageHealAmount();
+                OnDamageClicked?.Invoke(test);
+                print($"УРОН: {test}");
+                UpdateUI();
+            });
 
         if (healButton != null)
-            healButton.onClick.AddListener(() => OnHealClicked?.Invoke(GetDamageHealAmount()));
+            healButton.onClick.AddListener(() =>
+            {
+                OnHealClicked?.Invoke(GetDamageHealAmount());
+                UpdateUI();
+            });
 
         if (levelUpButton != null)
-            levelUpButton.onClick.AddListener(() => OnLevelUpClicked?.Invoke());
+            levelUpButton.onClick.AddListener(() =>
+            {
+                OnLevelUpClicked?.Invoke();
+                UpdateUI();
+            });
 
         if (deleteButton != null)
             deleteButton.onClick.AddListener(() => OnDeleteClicked?.Invoke());
@@ -128,7 +141,6 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterView
 
     public void DisplayCharacterDetails(CharacterUIData character)
     {
-        _currentCharacter = character;
         UpdateUI();
     }
 
@@ -150,75 +162,76 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterView
 
     public void ClearSelection()
     {
-        _currentCharacter = null;
         ClearUI();
     }
 
     private void UpdateUI()
     {
-        if (_currentCharacter == null) return;
+        if (_presenter == null) return;
+
+        var character = _presenter.GetSelectedCharacter();
 
         if (characterNameText != null)
-            characterNameText.text = _currentCharacter.Name;
+            characterNameText.text = character.Name;
 
         if (classRaceText != null)
-            classRaceText.text = _currentCharacter.ClassRaceText;
+            classRaceText.text = character.ClassRaceText;
 
         if (levelText != null)
-            levelText.text = _currentCharacter.LevelText;
+            levelText.text = character.LevelText;
 
         if (hpText != null)
-            hpText.text = $"{_currentCharacter.CurrentHp} / {_currentCharacter.MaxHp}";
+            hpText.text = $"{character.CurrentHp} / {character.MaxHp}";
 
         if (hpFractionText != null)
-            hpFractionText.text = $"{_currentCharacter.CurrentHp}/{_currentCharacter.MaxHp}";
+            hpFractionText.text = $"{character.CurrentHp}/{character.MaxHp}";
 
         if (hpSlider != null)
-            hpSlider.value = (float)_currentCharacter.CurrentHp / _currentCharacter.MaxHp;
+            hpSlider.value = (float)character.CurrentHp / character.MaxHp;
 
         if (strengthText != null)
-            strengthText.text = _currentCharacter.StrengthText;
+            strengthText.text = $"Сила: {character.StrengthText}";
 
         if (dexterityText != null)
-            dexterityText.text = _currentCharacter.DexterityText;
+            dexterityText.text = $"Ловкость: {character.DexterityText}";
 
         if (constitutionText != null)
-            constitutionText.text = _currentCharacter.ConstitutionText;
+            constitutionText.text = $"Телосложение: {character.ConstitutionText}";
 
         if (intelligenceText != null)
-            intelligenceText.text = _currentCharacter.IntelligenceText;
+            intelligenceText.text = $"Интеллект: {character.IntelligenceText}";
 
         if (wisdomText != null)
-            wisdomText.text = _currentCharacter.WisdomText;
+            wisdomText.text = $"Мудрость: {character.WisdomText}";
 
         if (charismaText != null)
-            charismaText.text = _currentCharacter.CharismaText;
+            charismaText.text = $"Харизма: {character.CharismaText}";
 
         if (armorClassText != null)
-            armorClassText.text = _currentCharacter.ArmorClassText;
+            armorClassText.text = character.ArmorClassText;
 
         if (initiativeText != null)
-            initiativeText.text = _currentCharacter.InitiativeText;
+            initiativeText.text = character.InitiativeText;
 
         if (proficiencyText != null)
-            proficiencyText.text = _currentCharacter.ProficiencyText;
+            proficiencyText.text = character.ProficiencyText;
 
         if (goldText != null)
-            goldText.text = _currentCharacter.Gold.ToString();
+            goldText.text = $"Золото: {character.Gold}";
 
         if (silverText != null)
-            silverText.text = _currentCharacter.Silver.ToString();
+            silverText.text = $"Серебро: {character.Silver}";
 
         if (copperText != null)
-            copperText.text = _currentCharacter.Copper.ToString();
+            copperText.text = $"Медь: {character.Copper}";
 
         if (backstoryText != null)
-            backstoryText.text = string.IsNullOrEmpty(_currentCharacter.Backstory)
-                ? "История не указана" : _currentCharacter.Backstory;
+            backstoryText.text = string.IsNullOrEmpty(character.Backstory)
+                ? "История не указана" : character.Backstory;
 
         if (notesText != null)
-            notesText.text = string.IsNullOrEmpty(_currentCharacter.Notes)
-                ? "Нет заметок" : _currentCharacter.Notes;
+            notesText.text = string.IsNullOrEmpty(character.Notes)
+                ? "Нет заметок" : character.Notes;
     }
 
     private void ClearUI()

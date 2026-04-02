@@ -1,14 +1,51 @@
 using System;
+using UnityEngine;
 
 [Serializable]
 public class CharacterStats
 {
-    public int Strength { get; set; } = 10;
-    public int Dexterity { get; set; } = 10;
-    public int Constitution { get; set; } = 10;
-    public int Intelligence { get; set; } = 10;
-    public int Wisdom { get; set; } = 10;
-    public int Charisma { get; set; } = 10;
+    [SerializeField] private int strength = 10;
+    [SerializeField] private int dexterity = 10;
+    [SerializeField] private int constitution = 10;
+    [SerializeField] private int intelligence = 10;
+    [SerializeField] private int wisdom = 10;
+    [SerializeField] private int charisma = 10;
+
+    public int Strength
+    {
+        get => strength;
+        set => strength = Math.Clamp(value, 1, 30);
+    }
+
+    public int Dexterity
+    {
+        get => dexterity;
+        set => dexterity = Math.Clamp(value, 1, 30);
+    }
+
+    public int Constitution
+    {
+        get => constitution;
+        set => constitution = Math.Clamp(value, 1, 30);
+    }
+
+    public int Intelligence
+    {
+        get => intelligence;
+        set => intelligence = Math.Clamp(value, 1, 30);
+    }
+
+    public int Wisdom
+    {
+        get => wisdom;
+        set => wisdom = Math.Clamp(value, 1, 30);
+    }
+
+    public int Charisma
+    {
+        get => charisma;
+        set => charisma = Math.Clamp(value, 1, 30);
+    }
 
     public int GetAbility(CharacterAbility ability)
     {

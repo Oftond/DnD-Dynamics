@@ -92,6 +92,7 @@ public class UIController : MonoBehaviour
 
     private void OnDamageClicked(int amount)
     {
+        print("ÓÐÎÎÎÎÎÎÎÎÎÎÎÎÎÍ!!!!!!!");
         _presenter.ApplyDamage(amount);
     }
 

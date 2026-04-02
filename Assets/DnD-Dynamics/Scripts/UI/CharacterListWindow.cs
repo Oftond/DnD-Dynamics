@@ -21,9 +21,9 @@ public class CharacterListWindow : MonoBehaviour, ICharacterView
     private CharacterPresenter _presenter;
     private Dictionary<string, CharacterListItemView> _characterItems = new Dictionary<string, CharacterListItemView>();
 
-    public event Action<string> OnCharacterSelected;
     public event Action OnCreateClicked;
     public event Action OnBackClicked;
+    public event Action<string> OnCharacterSelected;
 
     public void Initialize()
     {

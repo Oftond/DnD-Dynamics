@@ -58,6 +58,8 @@ public class UIManager : MonoBehaviour
             characterListWindow.SetPresenter(_presenter);
             characterListWindow.OnBackClicked += ShowMainMenu;
             characterListWindow.OnCreateClicked += ShowCreateCharacter;
+
+            characterListWindow.OnCharacterSelected += OnCharacterSelected;
         }
 
         if (characterDetailWindow != null)
@@ -75,6 +77,15 @@ public class UIManager : MonoBehaviour
             createCharacterWindow.OnCancelClicked += ShowCharacterList;
             createCharacterWindow.OnCreateClicked += OnCreateCharacter;
         }
+    }
+
+    private void OnCharacterSelected(string characterId)
+    {
+        Debug.Log($"UIManager: Character selected with ID: {characterId}");
+
+        _presenter.SelectCharacter(characterId);
+
+        ShowCharacterDetail();
     }
 
     private void OnCreateCharacter(string name, int race, int characterClass,
