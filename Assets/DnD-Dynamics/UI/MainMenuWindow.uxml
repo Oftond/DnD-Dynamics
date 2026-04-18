@@ -1,0 +1,21 @@
+<UXML xmlns="UnityEngine.UIElements" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <VisualElement name="MainMenuRoot" style="flex-direction: column; justify-content: center; align-items: center; flex-grow: 1;">
+        <!-- Title Section -->
+        <VisualElement name="TitleContainer" style="flex-direction: column; align-items: center; margin-bottom: 40px;">
+            <Label name="TitleText" text="DnD - Character Manager" style="font-size: 48px; -unity-font-style: bold; color: #FFFFFF; margin-bottom: 10px;"/>
+            <Label name="VersionText" text="v1.0.0" style="font-size: 18px; color: #AAAAAA;"/>
+        </VisualElement>
+
+        <!-- Menu Buttons Section -->
+        <VisualElement name="ButtonContainer" style="flex-direction: column; align-items: center; gap: 20px;">
+            <Button name="CharactersButton" text="Просмотреть персонажей" style="width: 400px; height: 60px; font-size: 24px;"/>
+            <Button name="CreateButton" text="Создать персонажа" style="width: 400px; height: 60px; font-size: 24px;"/>
+            <Button name="ExitButton" text="Выйти из приложения" style="width: 400px; height: 60px; font-size: 24px;"/>
+        </VisualElement>
+
+        <!-- Footer Section -->
+        <VisualElement name="FooterContainer" style="flex-direction: column; align-items: center; position: absolute; bottom: 20px;">
+            <Label name="CopyrightText" text="© 2024 DnD Dynamics. All rights reserved." style="font-size: 14px; color: #888888;"/>
+        </VisualElement>
+    </VisualElement>
+</UXML>

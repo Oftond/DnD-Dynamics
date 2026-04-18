@@ -1,0 +1,81 @@
+/* MainMenuWindow Styles */
+
+VisualElement {
+    -unity-font-definition: "Arial";
+}
+
+#MainMenuRoot {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    background-color: #1a1a2e;
+}
+
+#TitleContainer {
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+#TitleText {
+    font-size: 48px;
+    -unity-font-style: bold;
+    color: #ffffff;
+    margin-bottom: 10px;
+    -unity-text-align: middle-center;
+}
+
+#VersionText {
+    font-size: 18px;
+    color: #aaaaaa;
+    -unity-text-align: middle-center;
+}
+
+#ButtonContainer {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+#CharactersButton,
+#CreateButton,
+#ExitButton {
+    width: 400px;
+    height: 60px;
+    font-size: 24px;
+    -unity-font-style: bold;
+    color: #ffffff;
+    background-color: #16213e;
+    border-width: 2px;
+    border-color: #0f3460;
+    border-radius: 10px;
+    -unity-text-align: middle-center;
+}
+
+#CharactersButton:hover,
+#CreateButton:hover,
+#ExitButton:hover {
+    background-color: #0f3460;
+    border-color: #e94560;
+}
+
+#CharactersButton:active,
+#CreateButton:active,
+#ExitButton:active {
+    background-color: #e94560;
+    border-color: #ff6b6b;
+}
+
+#FooterContainer {
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    bottom: 20px;
+}
+
+#CopyrightText {
+    font-size: 14px;
+    color: #888888;
+    -unity-text-align: middle-center;
+}

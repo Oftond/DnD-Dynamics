@@ -1,18 +1,16 @@
-using TMPro;
 using UnityEngine;
-using UnityEngine.Diagnostics;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class MainMenuWindow : MonoBehaviour
 {
     [Header("Buttons")]
-    [SerializeField] private Button charactersButton;
-    [SerializeField] private Button createButton;
-    [SerializeField] private Button exitButton;
+    private Button _charactersButton;
+    private Button _createButton;
+    private Button _exitButton;
 
     [Header("Title")]
-    [SerializeField] private TextMeshProUGUI titleText;
-    [SerializeField] private TextMeshProUGUI versionText;
+    private Label _titleText;
+    private Label _versionText;
 
     public event System.Action OnCharactersClicked;
     public event System.Action OnCreateClicked;
@@ -20,17 +18,34 @@ public class MainMenuWindow : MonoBehaviour
 
     public void Initialize()
     {
-        if (charactersButton != null)
-            charactersButton.onClick.AddListener(() => OnCharactersClicked?.Invoke());
+        var root = GetComponent<UIDocument>().rootVisualElement;
 
-        if (createButton != null)
-            createButton.onClick.AddListener(() => OnCreateClicked?.Invoke());
+        // Load UXML and USS
+        if (root != null)
+        {
+            // Register buttons
+            _charactersButton = root.Q<Button>("CharactersButton");
+            _createButton = root.Q<Button>("CreateButton");
+            _exitButton = root.Q<Button>("ExitButton");
 
-        if (exitButton != null)
-            exitButton.onClick.AddListener(() => OnExitClicked?.Invoke());
+            // Register labels
+            _titleText = root.Q<Label>("TitleText");
+            _versionText = root.Q<Label>("VersionText");
 
-        if (versionText != null)
-            versionText.text = $"v{Constants.APP_VERSION}";
+            // Add event listeners
+            if (_charactersButton != null)
+                _charactersButton.clicked += () => OnCharactersClicked?.Invoke();
+
+            if (_createButton != null)
+                _createButton.clicked += () => OnCreateClicked?.Invoke();
+
+            if (_exitButton != null)
+                _exitButton.clicked += () => OnExitClicked?.Invoke();
+
+            // Set version text
+            if (_versionText != null)
+                _versionText.text = $"v{Constants.APP_VERSION}";
+        }
     }
 
     public void Show()
