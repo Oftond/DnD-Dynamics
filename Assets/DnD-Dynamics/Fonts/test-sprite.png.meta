@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a661cc3778867564bbc0929c24931473
+guid: c5dc52710fe53094298c4b87456fab33
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -503698123911995625
-    second: Button_RL_Background_0
+      213: 4475635734223996272
+    second: test-sprite_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,23 +126,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Button_RL_Background_0
+      name: test-sprite_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 518
-        height: 170
+        width: 1440
+        height: 960
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 30, y: 30, z: 30, w: 30}
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 71fd13a99318209f0800000000000000
-      internalID: -503698123911995625
+      spriteID: 0754772ccf6ac1e30800000000000000
+      internalID: 4475635734223996272
       vertices: []
       indices: 
       edges: []
@@ -151,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 4fa9eba89efece4449bed5797faaffbd
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Button_RL_Background_0: -503698123911995625
+      test-sprite_0: 4475635734223996272
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

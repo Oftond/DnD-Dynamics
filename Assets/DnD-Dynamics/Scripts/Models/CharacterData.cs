@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -32,6 +33,38 @@ public class CharacterData
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
+    public List<Skill> Skills { get; set; } = new List<Skill>();
+
+    // Spells
+    public Spellbook Spellbook { get; set; } = new Spellbook();
+    public CharacterAbility SpellcastingAbility { get; set; } = CharacterAbility.Intelligence;
+
+    // Inventory
+    public SerializableInventory SerializableInventory { get; set; } = new SerializableInventory();
+
+    private Inventory _inventory;
+
+    public Inventory Inventory
+    {
+        get
+        {
+            if (_inventory == null && SerializableInventory != null)
+            {
+                _inventory = SerializableInventory.ToInventory(this);
+            }
+            return _inventory;
+        }
+        set
+        {
+            _inventory = value;
+            if (_inventory != null)
+            {
+                _inventory.SetCharacter(this);
+                SerializableInventory = SerializableInventory.FromInventory(_inventory);
+            }
+        }
+    }
+
     public CharacterStats TotalStats => CalculateTotalStats();
 
     public int MaxHp => CalculateMaxHp();
@@ -46,6 +79,30 @@ public class CharacterData
     };
 
     public int InitiativeBonus => TotalStats.GetModifier(CharacterAbility.Dexterity);
+
+    public int SpellSaveDC => 8 + ProficiencyBonus + TotalStats.GetModifier(SpellcastingAbility);
+
+    public int SpellAttackBonus => ProficiencyBonus + TotalStats.GetModifier(SpellcastingAbility);
+
+    public List<Skill> AllSkills
+    {
+        get
+        {
+            if (Skills.Count == 0)
+                InitializeAllSkills();
+            return Skills;
+        }
+    }
+
+    private void InitializeAllSkills() => Skills = SkillManager.CreateCharacterSkills();
+
+    public Skill GetSkill(string id) => AllSkills.Find(s => s.Id == id);
+
+    public int GetSkillBonus(string id)
+    {
+        var skill = GetSkill(id);
+        return skill?.CalculateBonus(this) ?? 0;
+    }
 
     private CharacterStats CalculateTotalStats()
     {
