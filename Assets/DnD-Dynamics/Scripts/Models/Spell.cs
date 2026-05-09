@@ -6,10 +6,8 @@ public class Spell
 {
     public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
-    public string NameRu { get; set; } = string.Empty;
     public int Level { get; set; } = 0;
     public string School { get; set; } = string.Empty;
-    public string SchoolRu { get; set; } = string.Empty;
     public int CastingTime { get; set; } = 1;
     public string Range { get; set; } = "30 feet";
     public string Components { get; set; } = "V, S";
@@ -29,10 +27,8 @@ public class Spell
         _data = data;
         Id = data.Id;
         Name = data.Name;
-        NameRu = data.NameRu;
         Level = data.Level;
         School = data.School;
-        SchoolRu = data.SchoolRu;
         CastingTime = data.CastingTime;
         Range = data.Range;
         Components = data.Components;
@@ -60,11 +56,6 @@ public class Spell
             9 => "9 круг",
             _ => "Неизвестно"
         };
-    }
-
-    public string GetSchoolDisplayName()
-    {
-        return SchoolRu ?? School;
     }
 }
 
@@ -274,41 +265,5 @@ public class Spellbook
                 }
             }
         }
-    }
-}
-
-public static class SpellManager
-{
-    private static List<SpellData> _allSpellsData;
-
-    public static List<SpellData> GetAllSpellsData()
-    {
-        if (_allSpellsData == null || _allSpellsData.Count == 0)
-        {
-            _allSpellsData = GameDataService.Instance.LoadSpells();
-        }
-        return _allSpellsData;
-    }
-
-    public static SpellData GetSpellDataById(string id)
-    {
-        var spells = GetAllSpellsData();
-        return spells.Find(s => s.Id == id);
-    }
-
-    public static List<SpellData> GetSpellsByLevel(int level)
-    {
-        return GameDataService.Instance.GetSpellsByLevel(level);
-    }
-
-    public static List<SpellData> GetSpellsBySchool(string school)
-    {
-        var spells = GetAllSpellsData();
-        return spells.FindAll(s => s.School == school);
-    }
-
-    public static void ClearCache()
-    {
-        _allSpellsData = null;
     }
 }

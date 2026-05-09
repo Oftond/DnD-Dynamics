@@ -6,11 +6,9 @@ public class ItemData
 {
     public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
-    public string NameRu { get; set; } = string.Empty;
     public string Type { get; set; } = "Other";
     public string Rarity { get; set; } = "Common";
     public string Description { get; set; } = string.Empty;
-    public string DescriptionRu { get; set; } = string.Empty;
 
     public int Weight { get; set; } = 0;
     public int Cost { get; set; } = 0;

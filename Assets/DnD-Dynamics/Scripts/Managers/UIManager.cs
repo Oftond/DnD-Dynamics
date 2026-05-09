@@ -88,9 +88,7 @@ public class UIManager : MonoBehaviour
         ShowCharacterDetail();
     }
 
-    private void OnCreateCharacter(string name, int race, int characterClass,
-    int strength, int dexterity, int constitution,
-    int intelligence, int wisdom, int charisma)
+    private void OnCreateCharacter(string name, int race, int characterClass, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma)
     {
         Debug.Log($"Creating character: {name}, Race: {race}, Class: {characterClass}");
 

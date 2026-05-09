@@ -35,11 +35,9 @@ public class CharacterData
 
     public List<Skill> Skills { get; set; } = new List<Skill>();
 
-    // Spells
     public Spellbook Spellbook { get; set; } = new Spellbook();
     public CharacterAbility SpellcastingAbility { get; set; } = CharacterAbility.Intelligence;
 
-    // Inventory
     public SerializableInventory SerializableInventory { get; set; } = new SerializableInventory();
 
     private Inventory _inventory;
@@ -90,6 +88,7 @@ public class CharacterData
         {
             if (Skills.Count == 0)
                 InitializeAllSkills();
+
             return Skills;
         }
     }
@@ -101,6 +100,7 @@ public class CharacterData
     public int GetSkillBonus(string id)
     {
         var skill = GetSkill(id);
+
         return skill?.CalculateBonus(this) ?? 0;
     }
 
@@ -143,6 +143,7 @@ public class CharacterData
         }
 
         var averageHp = (hitDice / 2) + 1;
+
         return hitDice + conModifier + (Level - 1) * (averageHp + conModifier);
     }
 
@@ -165,6 +166,7 @@ public class CharacterData
         }
 
         UpdatedAt = DateTime.Now;
+
         return CurrentHp;
     }
 
@@ -173,6 +175,7 @@ public class CharacterData
         amount = Math.Max(1, amount);
         CurrentHp = Math.Min(MaxHp, CurrentHp + amount);
         UpdatedAt = DateTime.Now;
+
         return CurrentHp;
     }
 

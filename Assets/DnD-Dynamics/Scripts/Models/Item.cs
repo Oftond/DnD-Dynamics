@@ -6,11 +6,9 @@ public class Item
 {
     public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
-    public string NameRu { get; set; } = string.Empty;
     public string Type { get; set; } = "Other";
     public string Rarity { get; set; } = "Common";
     public string Description { get; set; } = string.Empty;
-    public string DescriptionRu { get; set; } = string.Empty;
 
     public int Weight { get; set; } = 0;
     public int Cost { get; set; } = 0;
@@ -42,11 +40,9 @@ public class Item
         _data = data;
         Id = data.Id;
         Name = data.Name;
-        NameRu = data.NameRu;
         Type = data.Type;
         Rarity = data.Rarity;
         Description = data.Description;
-        DescriptionRu = data.DescriptionRu;
         Weight = data.Weight;
         Cost = data.Cost;
         DamageDice = data.DamageDice;
@@ -109,7 +105,7 @@ public class Item
 
     public string GetFullDescription()
     {
-        var desc = $"{NameRu} ({GetTypeDisplayName()}, {GetRarityDisplayName()})";
+        var desc = $"{Name} ({GetTypeDisplayName()}, {GetRarityDisplayName()})";
         if (MagicBonus != 0)
             desc += $" +{MagicBonus}";
 
@@ -232,10 +228,6 @@ public class Inventory
 
     private CharacterData _character;
 
-    public Inventory()
-    {
-    }
-
     public Inventory(CharacterData character)
     {
         _character = character;
@@ -277,8 +269,7 @@ public class Inventory
 
     public Item FindItem(string itemId) => Items.Find(i => i.Id == itemId);
 
-    public List<Item> FindItemsByName(string name) =>
-        Items.FindAll(i => i.Name.Contains(name, StringComparison.OrdinalIgnoreCase) || i.NameRu.Contains(name, StringComparison.OrdinalIgnoreCase));
+    public List<Item> FindItemsByName(string name) => Items.FindAll(i => i.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
 
     public void EquipItem(Item item)
     {
@@ -316,13 +307,9 @@ public class Inventory
                 break;
             case "Ring":
                 if (Ring1 == null)
-                {
                     Ring1 = item;
-                }
                 else if (Ring2 == null)
-                {
                     Ring2 = item;
-                }
                 break;
         }
     }
@@ -377,6 +364,7 @@ public class Inventory
     private int CalculateCarryingCapacity()
     {
         if (_character == null) return 150;
+
         return _character.TotalStats.Strength * 15;
     }
 
@@ -385,36 +373,4 @@ public class Inventory
     public bool CanCarryMore() => TotalWeight < CarryingCapacity;
 
     public int GetAvailableCapacity() => Math.Max(0, CarryingCapacity - TotalWeight);
-}
-
-public static class ItemManager
-{
-    private static List<ItemData> _allItemsData;
-
-    public static List<ItemData> GetAllItemsData()
-    {
-        if (_allItemsData == null || _allItemsData.Count == 0)
-        {
-            _allItemsData = GameDataService.Instance.LoadItems();
-        }
-        return _allItemsData;
-    }
-
-    public static ItemData GetItemDataById(string id)
-    {
-        var items = GetAllItemsData();
-        return items.Find(i => i.Id == id);
-    }
-
-    public static List<ItemData> GetItemsByType(string type) => GameDataService.Instance.GetItemsByType(type);
-
-    public static Item CreateItemFromData(string itemId)
-    {
-        var itemData = GetItemDataById(itemId);
-        if (itemData == null) return null;
-
-        var item = new Item();
-        item.SetData(itemData);
-        return item;
-    }
 }
