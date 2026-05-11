@@ -17,23 +17,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject notificationPanel;
     [SerializeField] private TextMeshProUGUI notificationText;
 
-    private static UIManager _instance;
     private CharacterPresenter _presenter;
     private CharacterModel _model;
 
-    public static UIManager Instance => _instance;
-
     private void Awake()
     {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        _instance = this;
-        DontDestroyOnLoad(gameObject);
-
         _model = new CharacterModel();
         _presenter = new CharacterPresenter(_model);
 

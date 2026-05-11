@@ -1,56 +1,35 @@
 using UnityEngine;
+using Zenject;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour, IInitializable
 {
-    [Header("Managers")]
-    [SerializeField] private UIManager uiManager;
+    [Inject] private UIManager _uiManager;
 
-    private static GameManager _instance;
-    public static GameManager Instance => _instance;
+    public UIManager UIManager => _uiManager;
 
-    private void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        _instance = this;
-        DontDestroyOnLoad(gameObject);
-
-        Screen.sleepTimeout = SleepTimeout.NeverSleep;
-        Application.targetFrameRate = 60;
-
-        Initialize();
-    }
-
-    private void Initialize()
+    public void Initialize()
     {
         Debug.Log("GameManager initialized");
 
-        if (uiManager == null)
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
+        if (_uiManager == null)
         {
             Debug.LogError("UIManager not found! Creating default...");
             CreateDefaultUIManager();
         }
 
-        if (uiManager != null)
+        if (_uiManager != null)
         {
-            uiManager.ShowMainMenu();
+            _uiManager.ShowMainMenu();
         }
     }
 
     private void CreateDefaultUIManager()
     {
         var uiManagerObj = new GameObject("UIManager");
-        uiManager = uiManagerObj.AddComponent<UIManager>();
+        _uiManager = uiManagerObj.AddComponent<UIManager>();
         DontDestroyOnLoad(uiManagerObj);
-    }
-
-    public UIManager GetUIManager()
-    {
-        return uiManager;
     }
 
     private void OnApplicationQuit()

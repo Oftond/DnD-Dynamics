@@ -1,7 +1,10 @@
 using UnityEngine;
+using Zenject;
 
 public class UIController : MonoBehaviour
 {
+    [Inject] private UIManager _uiManager;
+
     private CharacterPresenter _presenter;
     private CharacterModel _model;
 
@@ -10,12 +13,12 @@ public class UIController : MonoBehaviour
         _model = new CharacterModel();
         _presenter = new CharacterPresenter(_model);
 
-        if (UIManager.Instance != null)
+        if (_uiManager != null)
         {
-            var mainMenu = UIManager.Instance.GetComponentInChildren<MainMenuWindow>(true);
-            var characterList = UIManager.Instance.GetComponentInChildren<CharacterListWindow>(true);
-            var characterDetail = UIManager.Instance.GetComponentInChildren<CharacterDetailWindow>(true);
-            var createWindow = UIManager.Instance.GetComponentInChildren<CreateCharacterWindow>(true);
+            var mainMenu = _uiManager.GetComponentInChildren<MainMenuWindow>(true);
+            var characterList = _uiManager.GetComponentInChildren<CharacterListWindow>(true);
+            var characterDetail = _uiManager.GetComponentInChildren<CharacterDetailWindow>(true);
+            var createWindow = _uiManager.GetComponentInChildren<CreateCharacterWindow>(true);
 
             if (mainMenu != null)
             {
@@ -57,32 +60,32 @@ public class UIController : MonoBehaviour
 
     private void ShowMainMenu()
     {
-        if (UIManager.Instance != null)
-            UIManager.Instance.ShowMainMenu();
+        if (_uiManager != null)
+            _uiManager.ShowMainMenu();
     }
 
     private void ShowCharacterList()
     {
-        if (UIManager.Instance != null)
+        if (_uiManager != null)
         {
-            UIManager.Instance.ShowCharacterList();
+            _uiManager.ShowCharacterList();
             _presenter.RefreshCharacters();
         }
     }
 
     private void ShowCharacterDetail(string characterId)
     {
-        if (UIManager.Instance != null)
+        if (_uiManager != null)
         {
-            UIManager.Instance.ShowCharacterDetail();
+            _uiManager.ShowCharacterDetail();
             _presenter.SelectCharacter(characterId);
         }
     }
 
     private void ShowCreateCharacter()
     {
-        if (UIManager.Instance != null)
-            UIManager.Instance.ShowCreateCharacter();
+        if (_uiManager != null)
+            _uiManager.ShowCreateCharacter();
     }
 
     private void OnCharacterSelected(string characterId)
