@@ -19,7 +19,7 @@ public class ItemData
     public bool IsLight { get; set; } = false;
     public bool IsHeavy { get; set; } = false;
     public bool IsTwoHanded { get; set; } = false;
-    public bool IsVersatile { get; set; } = false;
+    public bool IsVersatile { get; set; } = false;//FreshCraft 
     public string VersatileDamage { get; set; } = "1d6";
     public int Range { get; set; } = 0;
     public int LongRange { get; set; } = 0;
