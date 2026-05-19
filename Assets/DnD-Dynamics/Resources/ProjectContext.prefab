@@ -74,4 +74,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15f5bf736b831cc4c953aa026ecbda34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GlobalInstaller
-  _uiManager: {fileID: 8517902645847438850, guid: 759360294a97a6149b585c220807b095, type: 3}
+  _uiHandler: {fileID: 4746335306584068270, guid: 759360294a97a6149b585c220807b095, type: 3}
