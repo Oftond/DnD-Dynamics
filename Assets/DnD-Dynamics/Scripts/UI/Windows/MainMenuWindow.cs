@@ -9,6 +9,7 @@ public class MainMenuWindow : MonoBehaviour
     [SerializeField] private Button _charactersButton;
     [SerializeField] private Button _createButton;
     [SerializeField] private Button _handbookButton;
+    [SerializeField] private Button _dmToolsButton;
     [SerializeField] private Button _exitButton;
 
     [Header("Title")]
@@ -18,9 +19,10 @@ public class MainMenuWindow : MonoBehaviour
     public event Action OnCharactersClicked;
     public event Action OnCreateClicked;
     public event Action OnHandbookClicked;
+    public event Action OnDMToolsClicked;
     public event Action OnExitClicked;
 
-    public void Initialize()
+    private void Start()
     {
         if (_charactersButton != null)
             _charactersButton.onClick.AddListener(() => OnCharactersClicked?.Invoke());
@@ -30,6 +32,9 @@ public class MainMenuWindow : MonoBehaviour
 
         if (_handbookButton != null)
             _handbookButton.onClick.AddListener(() => OnHandbookClicked?.Invoke());
+
+        if (_dmToolsButton != null)
+            _dmToolsButton.onClick.AddListener(() => OnDMToolsClicked?.Invoke());
 
         if (_exitButton != null)
             _exitButton.onClick.AddListener(() => OnExitClicked?.Invoke());

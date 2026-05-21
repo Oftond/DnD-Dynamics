@@ -119,14 +119,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90ef7621a861e884ab0f06064f014713, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DnD_Dynamics.UI.UIHandler
-  mainMenuWindow: {fileID: 994979682620984205}
-  characterListWindow: {fileID: 5713056540143517601}
-  characterDetailWindow: {fileID: 341945796375460353}
-  createCharacterWindow: {fileID: 3464705296805110228}
-  loadingPanel: {fileID: 0}
-  loadingText: {fileID: 0}
-  notificationPanel: {fileID: 0}
-  notificationText: {fileID: 0}
+  _mainMenuWindow: {fileID: 994979682620984205}
+  _characterListWindow: {fileID: 5713056540143517601}
+  _characterDetailWindow: {fileID: 341945796375460353}
+  _createCharacterWindow: {fileID: 3464705296805110228}
+  _dmToolsWindow: {fileID: 0}
+  _loadingPanel: {fileID: 0}
+  _loadingText: {fileID: 0}
+  _notificationPanel: {fileID: 0}
+  _notificationText: {fileID: 0}
 --- !u!1 &2944812212944170470
 GameObject:
   m_ObjectHideFlags: 0

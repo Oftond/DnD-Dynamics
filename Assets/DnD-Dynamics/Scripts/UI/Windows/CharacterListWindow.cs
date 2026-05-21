@@ -2,11 +2,12 @@ using DnD_Dynamics.MVP.Presenter;
 using DnD_Dynamics.MVP.View;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CharacterListWindow : MonoBehaviour, ICharacterView
+public class CharacterListWindow : MonoBehaviour, ICharacterListView
 {
     [Header("UI Elements")]
     [SerializeField] private Transform charactersContainer;
@@ -20,14 +21,16 @@ public class CharacterListWindow : MonoBehaviour, ICharacterView
     [Header("Loading")]
     [SerializeField] private GameObject loadingSpinner;
 
-    private CharacterPresenter _presenter;
+    private CharacterListPresenter _presenter;
     private Dictionary<string, CharacterListItemView> _characterItems = new Dictionary<string, CharacterListItemView>();
+
+    private bool _isRefreshing = false;
 
     public event Action OnCreateClicked;
     public event Action OnBackClicked;
     public event Action<string> OnCharacterSelected;
 
-    public void Initialize()
+    private void Start()
     {
         if (createButton != null)
             createButton.onClick.AddListener(() => OnCreateClicked?.Invoke());
@@ -39,23 +42,24 @@ public class CharacterListWindow : MonoBehaviour, ICharacterView
             titleText.text = "Мои персонажи";
     }
 
-    public void SetPresenter(CharacterPresenter presenter)
+    public void SetPresenter(CharacterListPresenter presenter)
     {
         _presenter = presenter;
-        _presenter.SetView(this);
+        //_presenter.SetView(this);
     }
 
-    private void Awake()
+    public async Task RefreshCharacters()
     {
-        if (createButton != null)
-            createButton.onClick.AddListener(() => OnCreateClicked?.Invoke());
+        ShowLoading(true);
 
-        if (backButton != null)
-            backButton.onClick.AddListener(() => OnBackClicked?.Invoke());
-    }
+        if (_isRefreshing)
+        {
+            Debug.Log("Refresh already in progress, skipping...");
+            return;
+        }
 
-    public void RefreshCharacters()
-    {
+        _isRefreshing = true;
+
         Debug.Log("Refreshing character list");
 
         if (_presenter == null)
@@ -64,16 +68,22 @@ public class CharacterListWindow : MonoBehaviour, ICharacterView
             return;
         }
 
+        await _presenter.LoadCharactersAsync();
+
         var characters = _presenter.GetAllCharacters();
+
         UpdateCharacterList(characters);
 
         ShowEmptyState(characters.Count == 0);
+
+        ShowLoading(false);
+        _isRefreshing = false;
     }
 
-    public void Show()
+    public async Task Show()
     {
         gameObject.SetActive(true);
-        _presenter?.RefreshCharacters();
+        await RefreshCharacters();
     }
 
     public void Hide()
@@ -94,9 +104,7 @@ public class CharacterListWindow : MonoBehaviour, ICharacterView
         ShowEmptyState(false);
 
         foreach (var character in characters)
-        {
             AddCharacterItem(character);
-        }
     }
 
     public void DisplayCharacterDetails(CharacterUIData character)
@@ -107,11 +115,13 @@ public class CharacterListWindow : MonoBehaviour, ICharacterView
     public void ShowError(string message)
     {
         Debug.LogError($"Error: {message}");
+        //Показать UI уведомление
     }
 
     public void ShowSuccess(string message)
     {
         Debug.Log($"Success: {message}");
+        //Показать UI уведомление
     }
 
     public void ShowLoading(bool show)
@@ -122,12 +132,13 @@ public class CharacterListWindow : MonoBehaviour, ICharacterView
 
     public void ClearSelection()
     {
-
+        // Сброс выделения
     }
 
     private void AddCharacterItem(CharacterUIData character)
     {
-        if (characterItemPrefab == null || charactersContainer == null) return;
+        if (characterItemPrefab == null || charactersContainer == null)
+            return;
 
         var itemObject = Instantiate(characterItemPrefab, charactersContainer);
         var itemView = itemObject.GetComponent<CharacterListItemView>();
@@ -142,11 +153,16 @@ public class CharacterListWindow : MonoBehaviour, ICharacterView
 
     private void ClearCharacters()
     {
+        print(_characterItems.Count);
         foreach (var item in _characterItems.Values)
         {
             if (item != null)
+            {
                 Destroy(item.gameObject);
+                print("УДАЛЕНИЕ!!!!");
+            }
         }
+
         _characterItems.Clear();
     }
 
@@ -164,15 +180,12 @@ public class CharacterListWindow : MonoBehaviour, ICharacterView
     private void UpdateCharacterList(List<CharacterUIData> characters)
     {
         foreach (var item in _characterItems.Values)
-        {
             Destroy(item);
-        }
+
         _characterItems.Clear();
 
         foreach (var character in characters)
-        {
             AddCharacterItem(character);
-        }
 
         Debug.Log($"Character list updated: {characters.Count} characters");
     }

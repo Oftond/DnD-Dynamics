@@ -1,6 +1,7 @@
 using DnD_Dynamics.MVP.Model;
 using DnD_Dynamics.MVP.Presenter;
 using DnD_Dynamics.Services;
+using DnD_Dynamics.Services.Interfaces;
 using DnD_Dynamics.UI;
 using System.ComponentModel.Design;
 using UnityEditor.Search;
@@ -16,6 +17,10 @@ public class GlobalInstaller : MonoInstaller
         ServicesInstall();
 
         ManagersInstall();
+
+        PresentersInstall();
+
+        ModelsInstall();
     }
 
     private void ManagersInstall()
@@ -32,11 +37,22 @@ public class GlobalInstaller : MonoInstaller
         Container.Bind<IDataService>().To<DataService>().AsSingle();
 
         Container.Bind<IGameDataService>().To<GameDataService>().AsSingle();
-        Container.Bind<IHandbookDataService>().To<HandbookDataService>().AsSingle();
         Container.Bind<IHandbookFilterService>().To<HandbookFilterService>().AsSingle();
         Container.Bind<ISearchService>().To<SearchService>().AsSingle();
 
+        Container.Bind<ICombatService>().To<CombatService>().AsSingle();
+        Container.Bind<DiceRollerService>().AsSingle();
+    }
+
+    private void PresentersInstall()
+    {
+        Container.Bind<CharacterListPresenter>().AsSingle();
+        Container.Bind<CharacterDetailPresenter>().AsSingle();
+        Container.Bind<CreateCharacterPresenter>().AsSingle();
+    }
+
+    private void ModelsInstall()
+    {
         Container.Bind<CharacterModel>().AsSingle();
-        Container.Bind<CharacterPresenter>().AsSingle();
     }
 }

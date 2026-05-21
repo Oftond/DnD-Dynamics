@@ -2,6 +2,7 @@ using DnD_Dynamics.Models;
 using DnD_Dynamics.MVP.Presenter;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,7 +10,7 @@ using Debug = UnityEngine.Debug;
 
 namespace DnD_Dynamics.UI.Windows
 {
-    public class CreateCharacterWindow : MonoBehaviour
+    public class CreateCharacterWindow : MonoBehaviour, ICreateCharacterView
     {
         [Header("Character Info")]
         [SerializeField] private TMP_InputField nameInput;
@@ -30,8 +31,9 @@ namespace DnD_Dynamics.UI.Windows
 
         [Header("Validation")]
         [SerializeField] private TextMeshProUGUI errorText;
+        [SerializeField] private GameObject _loadingSpinner;
 
-        private CharacterPresenter _presenter;
+        private CreateCharacterPresenter _presenter;
         private List<CharacterRace> _availableRaces;
         private List<CharacterClass> _availableClasses;
         private List<string> _raceIds;
@@ -40,11 +42,8 @@ namespace DnD_Dynamics.UI.Windows
         public event Action<string, string, string, int, int, int, int, int, int> OnCreateClicked;
         public event Action OnCancelClicked;
 
-        public void Initialize()
+        private void Start()
         {
-            LoadRaceOptions();
-            LoadClassOptions();
-
             if (createButton != null)
                 createButton.onClick.AddListener(OnCreate);
 
@@ -54,11 +53,12 @@ namespace DnD_Dynamics.UI.Windows
             SetDefaultStats();
         }
 
-        private void LoadRaceOptions()
+        private async Task LoadRaceOptions()
         {
-            if (_presenter == null) return;
+            if (_presenter == null)
+                return;
 
-            _availableRaces = _presenter.GetAllRaces();
+            _availableRaces = await _presenter.GetRacesAsync();
 
             _raceIds = new List<string>();
             raceDropdown.ClearOptions();
@@ -73,11 +73,12 @@ namespace DnD_Dynamics.UI.Windows
             raceDropdown.AddOptions(options);
         }
 
-        private void LoadClassOptions()
+        private async Task LoadClassOptions()
         {
             if (_presenter == null) return;
 
-            _availableClasses = _presenter.GetAllClasses();
+            _availableClasses = await _presenter.GetClassesAsync();
+
             _classIds = new List<string>();
             classDropdown.ClearOptions();
 
@@ -91,21 +92,19 @@ namespace DnD_Dynamics.UI.Windows
             classDropdown.AddOptions(options);
         }
 
-        public void SetPresenter(CharacterPresenter presenter)
+        public void SetPresenter(CreateCharacterPresenter presenter)
         {
             _presenter = presenter;
-            LoadRaceOptions();
-            LoadClassOptions();
         }
 
-        public void Show()
+        public async Task Show()
         {
             gameObject.SetActive(true);
             SetDefaultStats();
             ClearError();
 
-            LoadRaceOptions();
-            LoadClassOptions();
+            await LoadRaceOptions();
+            await LoadClassOptions();
         }
 
         public void Hide()
@@ -169,9 +168,8 @@ namespace DnD_Dynamics.UI.Windows
         private int GetStatValue(TMP_InputField input, int defaultValue)
         {
             if (input != null && int.TryParse(input.text, out int value))
-            {
                 return Math.Clamp(value, 3, 20);
-            }
+
             return defaultValue;
         }
 
@@ -182,20 +180,48 @@ namespace DnD_Dynamics.UI.Windows
                 if (stat < 3 || stat > 20)
                     return false;
             }
+
             return true;
         }
 
         private void SetDefaultStats()
         {
-            if (strengthInput != null) strengthInput.text = "10";
-            if (dexterityInput != null) dexterityInput.text = "10";
-            if (constitutionInput != null) constitutionInput.text = "10";
-            if (intelligenceInput != null) intelligenceInput.text = "10";
-            if (wisdomInput != null) wisdomInput.text = "10";
-            if (charismaInput != null) charismaInput.text = "10";
+            if (strengthInput != null)
+                strengthInput.text = "10";
+
+            if (dexterityInput != null)
+                dexterityInput.text = "10";
+
+            if (constitutionInput != null)
+                constitutionInput.text = "10";
+
+            if (intelligenceInput != null)
+                intelligenceInput.text = "10";
+
+            if (wisdomInput != null)
+                wisdomInput.text = "10";
+
+            if (charismaInput != null)
+                charismaInput.text = "10";
         }
 
-        private void ShowError(string message)
+        public void SetRaces(List<CharacterRace> races, List<string> raceIds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetClasses(List<CharacterClass> classes, List<string> classIds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ClearError()
+        {
+            if (errorText != null)
+                errorText.gameObject.SetActive(false);
+        }
+
+        public void ShowError(string message)
         {
             if (errorText != null)
             {
@@ -203,12 +229,20 @@ namespace DnD_Dynamics.UI.Windows
                 errorText.gameObject.SetActive(true);
                 Invoke(nameof(ClearError), 3f);
             }
+
+            //Показать UI уведомление
         }
 
-        private void ClearError()
+        public void ShowSuccess(string message)
         {
-            if (errorText != null)
-                errorText.gameObject.SetActive(false);
+            Debug.Log($"Success: {message}");
+            //Показать UI уведомление
+        }
+
+        public void ShowLoading(bool show)
+        {
+            if (_loadingSpinner != null)
+                _loadingSpinner.SetActive(show);
         }
     }
 }

@@ -21,6 +21,8 @@ public class CharacterClass : HandbookEntity
 
     public int GetHitDice() => HitDice;
     public string GetPrimaryAbility() => PrimaryAbility;
+
+    public string GetDisplayName() => Name ?? "Неизвестно";
 }
 
 [Serializable]

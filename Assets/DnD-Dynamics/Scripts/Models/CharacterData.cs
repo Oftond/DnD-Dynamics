@@ -1,9 +1,9 @@
 using DnD_Dynamics.Models;
 using DnD_Dynamics.Services;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using UnityEngine;
+using Unity.VisualScripting;
 using Zenject;
 using Debug = UnityEngine.Debug;
 
@@ -20,6 +20,7 @@ public enum CharacterAbility
 [Serializable]
 public class CharacterData
 {
+    [JsonIgnore]
     [Inject] private SkillManager _skillManager;
 
     public string Id { get; set; } = Guid.NewGuid().ToString();
@@ -30,8 +31,9 @@ public class CharacterData
     public string RaceId { get; set; } = string.Empty;
     public string ClassId { get; set; } = string.Empty;
 
-    [NonSerialized] private CharacterRace _raceData;
-    [NonSerialized] private CharacterClass _classData;
+    [Serialize] private CharacterRace _raceData;
+
+    [Serialize] private CharacterClass _classData;
 
     public CharacterStats BaseStats { get; set; } = new CharacterStats();
     public CharacterStats BonusStats { get; set; } = new CharacterStats();
@@ -58,6 +60,7 @@ public class CharacterData
 
     private Inventory _inventory;
 
+    [JsonIgnore]
     public Inventory Inventory
     {
         get
@@ -79,6 +82,7 @@ public class CharacterData
         }
     }
 
+    [JsonIgnore]
     public CharacterRace Race
     {
         get => _raceData;
@@ -89,6 +93,7 @@ public class CharacterData
         }
     }
 
+    [JsonIgnore]
     public CharacterClass Class
     {
         get => _classData;
@@ -100,6 +105,7 @@ public class CharacterData
     }
 
     public CharacterStats TotalStats => CalculateTotalStats();
+
     public int MaxHp => CalculateMaxHp();
 
     public int ProficiencyBonus => Level switch
@@ -112,9 +118,12 @@ public class CharacterData
     };
 
     public int InitiativeBonus => TotalStats.GetModifier(CharacterAbility.Dexterity);
+
     public int SpellSaveDC => 8 + ProficiencyBonus + TotalStats.GetModifier(SpellcastingAbility);
+
     public int SpellAttackBonus => ProficiencyBonus + TotalStats.GetModifier(SpellcastingAbility);
 
+    [JsonIgnore]
     public List<Skill> AllSkills
     {
         get
@@ -127,13 +136,14 @@ public class CharacterData
 
     private void InitializeAllSkills() => Skills = _skillManager.CreateCharacterSkills();
 
-    public void InitializeSpellbook(IHandbookDataService handbookDataService) => Spellbook.Initialize(handbookDataService);
+    public void InitializeSpellbook(IDataService dataService) => Spellbook.Initialize(dataService);
 
     public Skill GetSkill(string id) => AllSkills.Find(s => s.Id == id);
 
     public int GetSkillBonus(string id)
     {
         var skill = GetSkill(id);
+
         return skill?.CalculateBonus(this) ?? 0;
     }
 
@@ -216,7 +226,7 @@ public class CharacterData
     {
         if (Level >= 20) return;
         Level++;
-        CurrentHp = MaxHp;
+
         UpdatedAt = DateTime.Now;
     }
 

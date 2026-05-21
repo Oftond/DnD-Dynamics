@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,8 +16,8 @@ public class HandbookCard : MonoBehaviour
 
     private HandbookEntity _item;
 
-    public event System.Action<HandbookEntity> OnClick;
-    public event System.Action<HandbookEntity, bool> OnFavoriteToggle;
+    public event Action<HandbookEntity> OnClick;
+    public event Action<HandbookEntity, bool> OnFavoriteToggle;
 
     public void Setup(HandbookEntity item)
     {

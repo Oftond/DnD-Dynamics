@@ -5,26 +5,31 @@ using DnD_Dynamics.Models;
 using DnD_Dynamics.UI.Windows;
 using DnD_Dynamics.MVP.Presenter;
 using TMPro;
+using System.Threading.Tasks;
 
 namespace DnD_Dynamics.UI
 {
     public class UIHandler : MonoBehaviour
     {
-        [Inject] private CharacterPresenter _presenter;
+        [Inject] private CharacterListPresenter _characterListPresenter;
+        [Inject] private CharacterDetailPresenter _characterDetailPresenter;
+        [Inject] private CreateCharacterPresenter _createCharacterPresenter;
 
         [Header("Windows")]
-        [SerializeField] private MainMenuWindow mainMenuWindow;
-        [SerializeField] private CharacterListWindow characterListWindow;
-        [SerializeField] private CharacterDetailWindow characterDetailWindow;
-        [SerializeField] private CreateCharacterWindow createCharacterWindow;
+        [SerializeField] private MainMenuWindow _mainMenuWindow;
+        [SerializeField] private CharacterListWindow _characterListWindow;
+        [SerializeField] private CharacterDetailWindow _characterDetailWindow;
+        [SerializeField] private CreateCharacterWindow _createCharacterWindow;
+        [SerializeField] private HandbookWindow _handbookWindow;
+        [SerializeField] private DMToolsWindow _dmToolsWindow;
 
         [Header("Loading")]
-        [SerializeField] private GameObject loadingPanel;
-        [SerializeField] private TextMeshProUGUI loadingText;
+        [SerializeField] private GameObject _loadingPanel;
+        [SerializeField] private TextMeshProUGUI _loadingText;
 
         [Header("Notifications")]
-        [SerializeField] private GameObject notificationPanel;
-        [SerializeField] private TextMeshProUGUI notificationText;
+        [SerializeField] private GameObject _notificationPanel;
+        [SerializeField] private TextMeshProUGUI _notificationText;
 
         private void Awake()
         {
@@ -33,125 +38,144 @@ namespace DnD_Dynamics.UI
 
         private void InitializeWindows()
         {
-            if (mainMenuWindow != null)
+            if (_mainMenuWindow != null)
             {
-                mainMenuWindow.Initialize();
-                mainMenuWindow.OnCharactersClicked += ShowCharacterList;
-                mainMenuWindow.OnCreateClicked += ShowCreateCharacter;
-                mainMenuWindow.OnExitClicked += ExitApplication;
+                _mainMenuWindow.OnCharactersClicked += ShowCharacterListHandler;
+                _mainMenuWindow.OnCreateClicked += ShowCreateCharacter;
+                _mainMenuWindow.OnHandbookClicked += ShowHandbook;
+                _mainMenuWindow.OnDMToolsClicked += ShowDMTools;
+                _mainMenuWindow.OnExitClicked += ExitApplication;
             }
 
-            if (characterListWindow != null)
+            if (_characterListWindow != null)
             {
-                characterListWindow.Initialize();
-                characterListWindow.SetPresenter(_presenter);
-                characterListWindow.OnBackClicked += ShowMainMenu;
-                characterListWindow.OnCreateClicked += ShowCreateCharacter;
-                characterListWindow.OnCharacterSelected += OnCharacterSelected;
+                _characterListWindow.SetPresenter(_characterListPresenter);
+                _characterListWindow.OnBackClicked += ShowMainMenu;
+                _characterListWindow.OnCreateClicked += ShowCreateCharacter;
+                _characterListWindow.OnCharacterSelected += OnCharacterSelected;
             }
 
-            if (characterDetailWindow != null)
+            if (_characterDetailWindow != null)
             {
-                characterDetailWindow.Initialize();
-                characterDetailWindow.SetPresenter(_presenter);
-                characterDetailWindow.OnBackClicked += ShowCharacterList;
-                characterDetailWindow.OnDamageClicked += amount => _presenter.ApplyDamage(amount);
-                characterDetailWindow.OnHealClicked += amount => _presenter.ApplyHeal(amount);
-                characterDetailWindow.OnLevelUpClicked += () => _presenter.LevelUp();
-                characterDetailWindow.OnDeleteClicked += () => { _presenter.DeleteCharacter(); ShowCharacterList(); };
+                _characterDetailWindow.SetPresenter(_characterDetailPresenter);
+                _characterDetailWindow.OnBackClicked += ShowCharacterListHandler;
+                _characterDetailWindow.OnDamageClicked += async amount => await _characterDetailPresenter.ApplyDamageAsync(amount);
+                _characterDetailWindow.OnHealClicked += async amount => await _characterDetailPresenter.ApplyHealAsync(amount);
+                _characterDetailWindow.OnLevelUpClicked += async () => await _characterDetailPresenter.LevelUpAsync();
+                _characterDetailWindow.OnDeleteClicked += async () =>
+                {
+                    await _characterDetailPresenter.DeleteCharacterAsync();
+                    
+                    await ShowCharacterList();
+                };
             }
 
-            if (createCharacterWindow != null)
+            if (_createCharacterWindow != null)
             {
-                createCharacterWindow.Initialize();
-                createCharacterWindow.SetPresenter(_presenter);
-                createCharacterWindow.OnCancelClicked += ShowCharacterList;
-                createCharacterWindow.OnCreateClicked += OnCreateCharacter;
+                _createCharacterWindow.SetPresenter(_createCharacterPresenter);
+                _createCharacterWindow.OnCancelClicked += ShowCharacterListHandler;
+                _createCharacterWindow.OnCreateClicked += OnCreateCharacter;
             }
         }
 
         private void OnCharacterSelected(string characterId)
         {
-            _presenter.SelectCharacter(characterId);
+            _characterListPresenter.SelectCharacter(characterId);
             ShowCharacterDetail();
         }
 
-        private void OnCreateCharacter(string name, string raceId, string classId, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma)
+        private async void OnCreateCharacter(string name, string raceId, string classId, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma)
         {
-            var race = _presenter.GetRaceById(raceId);
-            var characterClass = _presenter.GetClassById(classId);
+            await _createCharacterPresenter.CreateCharacterAsync(name, raceId, classId, strength, dexterity, constitution, intelligence, wisdom, charisma);
 
-            _presenter.CreateCharacter(name, race, characterClass,
-                strength, dexterity, constitution, intelligence, wisdom, charisma);
-
-            ShowCharacterList();
-            characterListWindow?.RefreshCharacters();
+            await ShowCharacterList();
         }
 
         public void ShowMainMenu()
         {
             HideAllWindows();
-            mainMenuWindow?.Show();
+            _mainMenuWindow?.Show();
         }
 
-        public void ShowCharacterList()
+        public async Task ShowCharacterList()
         {
             HideAllWindows();
-            characterListWindow?.Show();
-            _presenter?.RefreshCharacters();
+            await _characterListWindow?.Show();
+        }
+
+        private async void ShowCharacterListHandler()
+        {
+            HideAllWindows();
+            await _characterListWindow?.Show();
         }
 
         public void ShowCharacterDetail()
         {
             HideAllWindows();
-            characterDetailWindow?.Show();
+            _characterDetailWindow?.Show();
         }
 
-        public void ShowCreateCharacter()
+        public async void ShowCreateCharacter()
         {
             HideAllWindows();
-            createCharacterWindow?.Show();
+
+            await _createCharacterWindow?.Show();
+        }
+
+
+        public void ShowHandbook()
+        {
+            HideAllWindows();
+
+            _handbookWindow?.Show();
+        }
+
+        public void ShowDMTools()
+        {
+            HideAllWindows();
+
+            _dmToolsWindow?.Show();
         }
 
         private void HideAllWindows()
         {
-            mainMenuWindow?.Hide();
-            characterListWindow?.Hide();
-            characterDetailWindow?.Hide();
-            createCharacterWindow?.Hide();
+            _mainMenuWindow?.Hide();
+            _characterListWindow?.Hide();
+            _characterDetailWindow?.Hide();
+            _createCharacterWindow?.Hide();
         }
 
         public void ShowLoading(string message = "Загрузка...")
         {
-            if (loadingPanel != null)
+            if (_loadingPanel != null)
             {
-                if (loadingText != null)
-                    loadingText.text = message;
-                loadingPanel.SetActive(true);
+                if (_loadingText != null)
+                    _loadingText.text = message;
+                _loadingPanel.SetActive(true);
             }
         }
 
         public void HideLoading()
         {
-            if (loadingPanel != null)
-                loadingPanel.SetActive(false);
+            if (_loadingPanel != null)
+                _loadingPanel.SetActive(false);
         }
 
         public void ShowNotification(string message, float duration = 2f)
         {
-            if (notificationPanel != null)
+            if (_notificationPanel != null)
             {
-                if (notificationText != null)
-                    notificationText.text = message;
-                notificationPanel.SetActive(true);
+                if (_notificationText != null)
+                    _notificationText.text = message;
+                _notificationPanel.SetActive(true);
                 Invoke(nameof(HideNotification), duration);
             }
         }
 
         private void HideNotification()
         {
-            if (notificationPanel != null)
-                notificationPanel.SetActive(false);
+            if (_notificationPanel != null)
+                _notificationPanel.SetActive(false);
         }
 
         public void ShowError(string message)

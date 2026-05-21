@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CharacterDetailWindow : MonoBehaviour, ICharacterView
+public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
 {
     [Header("Basic Info")]
     [SerializeField] private TextMeshProUGUI characterNameText;
@@ -50,9 +50,10 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterView
     [SerializeField] private Button backButton;
 
     [Header("Loading")]
-    [SerializeField] private GameObject loadingSpinner;
+    [SerializeField] private GameObject _loadingSpinner;
 
-    private CharacterPresenter _presenter;
+    private CharacterDetailPresenter _presenter;
+    private CharacterUIData _currentCharacter;
 
     public event Action OnBackClicked;
     public event Action<int> OnDamageClicked;
@@ -61,13 +62,12 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterView
     public event Action OnDeleteClicked;
     public event Action OnEditClicked;
 
-    public void Initialize()
+    private void Start()
     {
         if (damageButton != null)
             damageButton.onClick.AddListener(() =>
             {
-                var test = GetDamageHealAmount();
-                OnDamageClicked?.Invoke(test);
+                OnDamageClicked?.Invoke(GetDamageHealAmount());
                 UpdateUI();
             });
 
@@ -98,31 +98,10 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterView
             damageHealInput.text = "5";
     }
 
-    public void SetPresenter(CharacterPresenter presenter)
+    public void SetPresenter(CharacterDetailPresenter presenter)
     {
         _presenter = presenter;
         _presenter.SetView(this);
-    }
-
-    private void Awake()
-    {
-        if (damageButton != null)
-            damageButton.onClick.AddListener(() => OnDamageClicked?.Invoke(GetDamageHealAmount()));
-
-        if (healButton != null)
-            healButton.onClick.AddListener(() => OnHealClicked?.Invoke(GetDamageHealAmount()));
-
-        if (levelUpButton != null)
-            levelUpButton.onClick.AddListener(() => OnLevelUpClicked?.Invoke());
-
-        if (deleteButton != null)
-            deleteButton.onClick.AddListener(() => OnDeleteClicked?.Invoke());
-
-        if (editButton != null)
-            editButton.onClick.AddListener(() => OnEditClicked?.Invoke());
-
-        if (backButton != null)
-            backButton.onClick.AddListener(() => OnBackClicked?.Invoke());
     }
 
     public void Show()
@@ -135,30 +114,28 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterView
         gameObject.SetActive(false);
     }
 
-    public void DisplayCharacters(System.Collections.Generic.List<CharacterUIData> characters)
-    {
-
-    }
-
     public void DisplayCharacterDetails(CharacterUIData character)
     {
+        _currentCharacter = character;
         UpdateUI();
     }
 
     public void ShowError(string message)
     {
         Debug.LogError($"Error: {message}");
+        //Показать UI уведомление
     }
 
     public void ShowSuccess(string message)
     {
         Debug.Log($"Success: {message}");
+        //Показать UI уведомление
     }
 
     public void ShowLoading(bool show)
     {
-        if (loadingSpinner != null)
-            loadingSpinner.SetActive(show);
+        if (_loadingSpinner != null)
+            _loadingSpinner.SetActive(show);
     }
 
     public void ClearSelection()
@@ -227,28 +204,31 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterView
             copperText.text = $"Медь: {character.Copper}";
 
         if (backstoryText != null)
-            backstoryText.text = string.IsNullOrEmpty(character.Backstory)
-                ? "История не указана" : character.Backstory;
+            backstoryText.text = string.IsNullOrEmpty(character.Backstory) ? "История не указана" : character.Backstory;
 
         if (notesText != null)
-            notesText.text = string.IsNullOrEmpty(character.Notes)
-                ? "Нет заметок" : character.Notes;
+            notesText.text = string.IsNullOrEmpty(character.Notes) ? "Нет заметок" : character.Notes;
     }
 
     private void ClearUI()
     {
-        if (characterNameText != null) characterNameText.text = "";
-        if (classRaceText != null) classRaceText.text = "";
-        if (hpText != null) hpText.text = "0/0";
-        if (hpSlider != null) hpSlider.value = 0;
+        if (characterNameText != null)
+            characterNameText.text = "";
+
+        if (classRaceText != null)
+            classRaceText.text = "";
+
+        if (hpText != null)
+            hpText.text = "0/0";
+
+        if (hpSlider != null)
+            hpSlider.value = 0;
     }
 
     private int GetDamageHealAmount()
     {
         if (damageHealInput != null && int.TryParse(damageHealInput.text, out int amount))
-        {
             return Mathf.Max(1, amount);
-        }
 
         return 5;
     }

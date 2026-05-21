@@ -56,8 +56,10 @@ namespace DnD_Dynamics.MVP.Presenters
         {
             if (favoritesOnly)
                 return items.Where(x => x.IsFavorite).ToList();
+
             if (homebrewOnly)
                 return items.Where(x => x.IsHomebrew).ToList();
+
             return items;
         }
 
@@ -148,9 +150,13 @@ namespace DnD_Dynamics.MVP.Presenters
         }
 
         public void CreateNewSpell(Spell spell) => _model.AddSpell(spell);
+
         public void CreateNewItem(Item item) => _model.AddItem(item);
+
         public void CreateNewMonster(Monster monster) => _model.AddMonster(monster);
+
         public void CreateNewRace(CharacterRace race) => _model.AddRace(race);
+
         public void CreateNewClass(CharacterClass charClass) => _model.AddClass(charClass);
 
         public HandbookCategory GetCurrentCategory() => _currentCategory;

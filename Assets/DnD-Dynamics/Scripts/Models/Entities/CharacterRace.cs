@@ -17,6 +17,8 @@ public class CharacterRace : HandbookEntity
 
         return AbilityBonuses.ContainsKey(key) ? AbilityBonuses[key] : 0;
     }
+
+    public string GetDisplayName() => Name ?? "Неизвестно";
 }
 
 [Serializable]

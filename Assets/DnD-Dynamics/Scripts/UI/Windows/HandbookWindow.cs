@@ -3,6 +3,7 @@ using DnD_Dynamics.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -62,7 +63,7 @@ namespace DnD_Dynamics.UI.Windows
         [SerializeField] private Button editButton;
         [SerializeField] private Button deleteButton;
 
-        private IHandbookDataService _dataService;
+        private IDataService _dataService;
         private IHandbookFilterService _filterService;
         private List<CharacterClass> _allClasses;
         private Dictionary<int, string> _classIdMap = new Dictionary<int, string>();
@@ -76,16 +77,16 @@ namespace DnD_Dynamics.UI.Windows
         private enum ViewMode { All, Favorites, Homebrew }
 
         [Inject]
-        public void Construct(IHandbookDataService dataService, IHandbookFilterService filterService)
+        public void Construct(IDataService dataService, IHandbookFilterService filterService)
         {
             _dataService = dataService;
             _filterService = filterService;
-            LoadClassFilterOptions();
         }
 
-        private void LoadClassFilterOptions()
+        private async Task LoadClassFilterOptions()
         {
-            _allClasses = _dataService.GetAllClasses();
+            _allClasses = await _dataService.GetClassesAsync();
+
             spellClassFilter.ClearOptions();
             var options = new List<TMP_Dropdown.OptionData> { new TMP_Dropdown.OptionData("Все классы") };
 
@@ -97,35 +98,59 @@ namespace DnD_Dynamics.UI.Windows
             spellClassFilter.AddOptions(options);
         }
 
-        private void Start()
+        private async void Start()
         {
+            await LoadClassFilterOptions();
+
             InitializeTabs();
+
             InitializeViewModes();
+
             InitializeFilters();
+
             InitializeDetailsPanel();
-            LoadCategory(HandbookCategory.Spells);
+
+            await LoadCategory(HandbookCategory.Spells);
         }
 
         private void InitializeTabs()
         {
-            spellsTab.onClick.AddListener(() => LoadCategory(HandbookCategory.Spells));
-            itemsTab.onClick.AddListener(() => LoadCategory(HandbookCategory.Items));
-            monstersTab.onClick.AddListener(() => LoadCategory(HandbookCategory.Monsters));
+            spellsTab.onClick.AddListener(async () => await LoadCategory(HandbookCategory.Spells));
+            itemsTab.onClick.AddListener(async () => await LoadCategory(HandbookCategory.Items));
+            monstersTab.onClick.AddListener(async () => await LoadCategory(HandbookCategory.Monsters));
 
-            searchInput.onValueChanged.AddListener(OnSearchChanged);
+            searchInput.onValueChanged.AddListener(async (q) => await OnSearchChanged(q));
             filterToggleButton.onClick.AddListener(() => filterPanel.SetActive(!filterPanel.activeSelf));
         }
 
         private void InitializeViewModes()
         {
-            allModeToggle.onValueChanged.AddListener((isOn) => {
-                if (isOn) { _currentViewMode = ViewMode.All; ApplyFilters(); }
+            allModeToggle.onValueChanged.AddListener(async (isOn) =>
+            {
+                if (isOn)
+                {
+                    _currentViewMode = ViewMode.All;
+
+                    await ApplyFiltersAsync();
+                }
             });
-            favoritesModeToggle.onValueChanged.AddListener((isOn) => {
-                if (isOn) { _currentViewMode = ViewMode.Favorites; ApplyFilters(); }
+            favoritesModeToggle.onValueChanged.AddListener(async (isOn) =>
+            {
+                if (isOn)
+                {
+                    _currentViewMode = ViewMode.Favorites;
+
+                    await ApplyFiltersAsync();
+                }
             });
-            homebrewModeToggle.onValueChanged.AddListener((isOn) => {
-                if (isOn) { _currentViewMode = ViewMode.Homebrew; ApplyFilters(); }
+            homebrewModeToggle.onValueChanged.AddListener(async (isOn) =>
+            {
+                if (isOn)
+                {
+                    _currentViewMode = ViewMode.Homebrew;
+
+                    await ApplyFiltersAsync();
+                }
             });
         }
 
@@ -141,7 +166,7 @@ namespace DnD_Dynamics.UI.Windows
                 new TMP_Dropdown.OptionData("7 круг"), new TMP_Dropdown.OptionData("8 круг"),
                 new TMP_Dropdown.OptionData("9 круг")
             };
-            spellLevelFilter.onValueChanged.AddListener(_ => ApplyFilters());
+            spellLevelFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
 
             spellSchoolFilter.options = new List<TMP_Dropdown.OptionData>
             {
@@ -151,8 +176,8 @@ namespace DnD_Dynamics.UI.Windows
                 new TMP_Dropdown.OptionData("Воплощение"), new TMP_Dropdown.OptionData("Иллюзия"),
                 new TMP_Dropdown.OptionData("Некромантия"), new TMP_Dropdown.OptionData("Преобразование")
             };
-            spellSchoolFilter.onValueChanged.AddListener(_ => ApplyFilters());
-            spellClassFilter.onValueChanged.AddListener(_ => ApplyFilters());
+            spellSchoolFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
+            spellClassFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
 
             itemRarityFilter.options = new List<TMP_Dropdown.OptionData>
             {
@@ -161,7 +186,7 @@ namespace DnD_Dynamics.UI.Windows
                 new TMP_Dropdown.OptionData("Редкий"), new TMP_Dropdown.OptionData("Очень редкий"),
                 new TMP_Dropdown.OptionData("Легендарный"), new TMP_Dropdown.OptionData("Артефакт")
             };
-            itemRarityFilter.onValueChanged.AddListener(_ => ApplyFilters());
+            itemRarityFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
 
             itemTypeFilter.options = new List<TMP_Dropdown.OptionData>
             {
@@ -173,12 +198,12 @@ namespace DnD_Dynamics.UI.Windows
                 new TMP_Dropdown.OptionData("Зелье"), new TMP_Dropdown.OptionData("Свиток"),
                 new TMP_Dropdown.OptionData("Инструмент"), new TMP_Dropdown.OptionData("Прочее")
             };
-            itemTypeFilter.onValueChanged.AddListener(_ => ApplyFilters());
+            itemTypeFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
 
-            monsterCrMinSlider.onValueChanged.AddListener(v => { monsterCrMinText.text = v.ToString("F1"); ApplyFilters(); });
-            monsterCrMaxSlider.onValueChanged.AddListener(v => { monsterCrMaxText.text = v.ToString("F1"); ApplyFilters(); });
-            monsterTypeFilter.onValueChanged.AddListener(_ => ApplyFilters());
-            monsterSizeFilter.onValueChanged.AddListener(_ => ApplyFilters());
+            monsterCrMinSlider.onValueChanged.AddListener(async v => { monsterCrMinText.text = v.ToString("F1"); await ApplyFiltersAsync(); });
+            monsterCrMaxSlider.onValueChanged.AddListener(async v => { monsterCrMaxText.text = v.ToString("F1"); await ApplyFiltersAsync(); });
+            monsterTypeFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
+            monsterSizeFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
         }
 
         private void InitializeDetailsPanel()
@@ -188,20 +213,20 @@ namespace DnD_Dynamics.UI.Windows
             {
                 if (_selectedItem != null)
                 {
-                    _dataService.ToggleFavorite(_selectedItem.Id, _currentCategory);
+                    _dataService.ToggleFavoriteAsync(_selectedItem.Id, _currentCategory);
                     detailsFavoriteButton.GetComponent<Image>().color = _selectedItem.IsFavorite ? Color.yellow : Color.gray;
                     UpdateCardFavorite(_selectedItem.Id, _selectedItem.IsFavorite);
                 }
             });
         }
 
-        private void LoadCategory(HandbookCategory category)
+        private async Task LoadCategory(HandbookCategory category)
         {
             _currentCategory = category;
             _currentViewMode = ViewMode.All;
             allModeToggle.isOn = true;
             ClearCards();
-            ApplyFilters();
+            await ApplyFiltersAsync();
             UpdateEmptyStateText();
         }
 
@@ -229,7 +254,7 @@ namespace DnD_Dynamics.UI.Windows
             };
         }
 
-        private void ApplyFilters()
+        private async Task ApplyFiltersAsync()
         {
             string searchQuery = searchInput.text;
             List<HandbookEntity> baseItems;
@@ -237,17 +262,21 @@ namespace DnD_Dynamics.UI.Windows
             switch (_currentCategory)
             {
                 case HandbookCategory.Spells:
-                    var allSpells = _dataService.GetAllSpells().Cast<HandbookEntity>().ToList();
+                    var allSpells = (await _dataService.GetSpellsAsync()).Cast<HandbookEntity>().ToList();
+
                     baseItems = _currentViewMode switch
                     {
                         ViewMode.Favorites => allSpells.Where(s => s.IsFavorite).ToList(),
+
                         ViewMode.Homebrew => allSpells.Where(s => s.IsHomebrew).ToList(),
-                        _ => allSpells
+
+                        _ => allSpells.Cast<HandbookEntity>().ToList()
                     };
                     break;
 
                 case HandbookCategory.Items:
-                    var allItems = _dataService.GetAllItems().Cast<HandbookEntity>().ToList();
+                    var allItems = (await _dataService.GetItemsAsync()).Cast<HandbookEntity>().ToList();
+
                     baseItems = _currentViewMode switch
                     {
                         ViewMode.Favorites => allItems.Where(i => i.IsFavorite).ToList(),
@@ -257,7 +286,7 @@ namespace DnD_Dynamics.UI.Windows
                     break;
 
                 case HandbookCategory.Monsters:
-                    var allMonsters = _dataService.GetAllMonsters().Cast<HandbookEntity>().ToList();
+                    var allMonsters = (await _dataService.GetMonstersAsync()).Cast<HandbookEntity>().ToList();
                     baseItems = _currentViewMode switch
                     {
                         ViewMode.Favorites => allMonsters.Where(m => m.IsFavorite).ToList(),
@@ -279,8 +308,7 @@ namespace DnD_Dynamics.UI.Windows
                 case HandbookCategory.Spells:
                     int level = spellLevelFilter.value == 0 ? -1 : spellLevelFilter.value - 1;
                     SpellSchool? school = spellSchoolFilter.value == 0 ? null : (SpellSchool?)(spellSchoolFilter.value - 1);
-                    string requiredClassId = spellClassFilter.value > 0 && _classIdMap.ContainsKey(spellClassFilter.value)
-                        ? _classIdMap[spellClassFilter.value] : null;
+                    string requiredClassId = spellClassFilter.value > 0 && _classIdMap.ContainsKey(spellClassFilter.value) ? _classIdMap[spellClassFilter.value] : null;
 
                     var spells = _currentItems.Cast<Spell>().ToList();
                     var filteredSpells = _filterService.FilterSpells(spells, level == -1 ? null : level, school, requiredClassId);
@@ -330,7 +358,7 @@ namespace DnD_Dynamics.UI.Windows
                 card.OnClick += ShowDetails;
                 card.OnFavoriteToggle += (i, isFavorite) =>
                 {
-                    _dataService.ToggleFavorite(i.Id, _currentCategory);
+                    _dataService.ToggleFavoriteAsync(i.Id, _currentCategory);
                     i.IsFavorite = isFavorite;
                 };
                 _cards[item.Id] = card;
@@ -390,6 +418,11 @@ namespace DnD_Dynamics.UI.Windows
             _cards.Clear();
         }
 
-        private void OnSearchChanged(string query) => ApplyFilters();
+        public void Show()
+        {
+            gameObject.SetActive(true);
+        }
+
+        private async Task OnSearchChanged(string query) => await ApplyFiltersAsync();
     }
 }

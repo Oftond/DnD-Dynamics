@@ -2,6 +2,7 @@ using DnD_Dynamics.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Zenject;
 
 namespace DnD_Dynamics.Models
@@ -43,28 +44,32 @@ namespace DnD_Dynamics.Models
     [Serializable]
     public class Spellbook
     {
-        public List<string> KnownSpellIds = new List<string>();
-        public List<string> PreparedSpellIds = new List<string>();
-        public List<SpellSlot> SpellSlots = new List<SpellSlot>();
+        [NonSerialized] public List<string> _knownSpellIds = new();
+        [NonSerialized] public List<string> _preparedSpellIds = new();
+        [NonSerialized] public List<SpellSlot> _spellSlots = new();
+        [NonSerialized] private List<Spell> _allSpells = new();
 
-        [NonSerialized] private List<Spell> _spellsCache;
+        [NonSerialized] private Task<List<Spell>> _loadingTask;
+        [NonSerialized] private IDataService _dataService;
 
-        [NonSerialized] private IHandbookDataService _handbookDataService;
+        public List<string> KnownSpellIds => _knownSpellIds;
+        public List<string> PreparedSpellIds => _preparedSpellIds;
+        public List<SpellSlot> SpellSlots => _spellSlots;
 
         public Spellbook() { }
 
         [Inject]
-        public Spellbook(IHandbookDataService handbookDataService)
+        public Spellbook(IDataService dataService)
         {
-            _handbookDataService = handbookDataService;
+            _dataService = dataService;
             InitializeSpellSlots();
         }
 
-        public void Initialize(IHandbookDataService handbookDataService)
+        public void Initialize(IDataService dataService)
         {
-            _handbookDataService = handbookDataService;
+            _dataService = dataService;
 
-            if (SpellSlots.Count == 0)
+            if (_spellSlots.Count == 0)
                 InitializeSpellSlots();
         }
 
@@ -72,7 +77,7 @@ namespace DnD_Dynamics.Models
         {
             for (int i = 0; i <= 9; i++)
             {
-                SpellSlots.Add(new SpellSlot
+                _spellSlots.Add(new SpellSlot
                 {
                     Level = i,
                     MaxSlots = 0,
@@ -81,29 +86,59 @@ namespace DnD_Dynamics.Models
             }
         }
 
-        private List<Spell> GetSpellsData()
+        private async Task<List<Spell>> GetSpellsAsync()
         {
-            if (_spellsCache == null && _handbookDataService != null)
-            {
-                _spellsCache = _handbookDataService.GetAllSpells();
-            }
+            if (_allSpells != null)
+                return _allSpells;
 
-            return _spellsCache ?? new List<Spell>();
+            if (_loadingTask != null)
+                return await _loadingTask;
+
+            _loadingTask = Task.Run(async () =>
+            {
+                if (_dataService != null)
+                    return await _dataService.GetSpellsAsync();
+                return new List<Spell>();
+            });
+
+            _allSpells = await _loadingTask;
+
+            return _allSpells;
         }
 
-        public Spell GetSpellById(string id)
+        private List<Spell> GetSpellsData() => _dataService.GetSpellsAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+
+        public async Task<Spell> GetSpellByIdAsync(string id)
         {
-            var spells = GetSpellsData();
+            var spells = await GetSpellsAsync();
 
             return spells.Find(s => s.Id == id);
         }
 
-        public List<Spell> GetAllKnownSpells()
+        public Spell GetSpellById(string id) => GetSpellByIdAsync(id).ConfigureAwait(false).GetAwaiter().GetResult();
+
+        public async Task<List<Spell>> GetAllKnownSpellsAsync()
         {
-            var allSpells = GetSpellsData();
+            var allSpells = await GetSpellsAsync();
             var result = new List<Spell>();
 
-            foreach (var id in KnownSpellIds)
+            foreach (var id in _knownSpellIds)
+            {
+                var spell = allSpells.Find(s => s.Id == id);
+
+                if (spell != null)
+                    result.Add(spell);
+            }
+
+            return result;
+        }
+
+        public async Task<List<Spell>> GetPreparedSpellsAsync()
+        {
+            var allSpells = await GetSpellsAsync();
+            var result = new List<Spell>();
+
+            foreach (var id in _preparedSpellIds)
             {
                 var spell = allSpells.Find(s => s.Id == id);
                 if (spell != null)
@@ -113,58 +148,47 @@ namespace DnD_Dynamics.Models
             return result;
         }
 
-        public List<Spell> GetPreparedSpells()
-        {
-            var allSpells = GetSpellsData();
-            var result = new List<Spell>();
+        public List<Spell> GetPreparedSpells() => GetPreparedSpellsAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
-            foreach (var id in PreparedSpellIds)
-            {
-                var spell = allSpells.Find(s => s.Id == id);
-                if (spell != null)
-                    result.Add(spell);
-            }
+        public async Task<List<Spell>> GetSpellsByLevelAsync(int level) => (await GetAllKnownSpellsAsync()).FindAll(s => (int)s.Level == level);
 
-            return result;
-        }
-
-        public List<Spell> GetSpellsByLevel(int level) => GetAllKnownSpells().FindAll(s => (int)s.Level == level);
+        public List<Spell> GetSpellsByLevel(int level) => GetSpellsByLevelAsync(level).ConfigureAwait(false).GetAwaiter().GetResult();
 
         public void AddSpell(string spellId)
         {
-            if (!KnownSpellIds.Contains(spellId))
-                KnownSpellIds.Add(spellId);
+            if (!_knownSpellIds.Contains(spellId))
+                _knownSpellIds.Add(spellId);
         }
 
         public void RemoveSpell(string spellId)
         {
-            KnownSpellIds.Remove(spellId);
-            PreparedSpellIds.Remove(spellId);
+            _knownSpellIds.Remove(spellId);
+            _preparedSpellIds.Remove(spellId);
         }
 
         public void PrepareSpell(string spellId)
         {
-            if (KnownSpellIds.Contains(spellId) && !PreparedSpellIds.Contains(spellId))
-                PreparedSpellIds.Add(spellId);
+            if (_knownSpellIds.Contains(spellId) && !_preparedSpellIds.Contains(spellId))
+                _preparedSpellIds.Add(spellId);
         }
 
-        public void UnprepareSpell(string spellId) => PreparedSpellIds.Remove(spellId);
+        public void UnprepareSpell(string spellId) => _preparedSpellIds.Remove(spellId);
 
         public void UseSpellSlot(int level)
         {
-            var slot = SpellSlots.Find(s => s.Level == level);
+            var slot = _spellSlots.Find(s => s.Level == level);
             slot?.UseSlot();
         }
 
         public void RestoreSpellSlot(int level)
         {
-            var slot = SpellSlots.Find(s => s.Level == level);
+            var slot = _spellSlots.Find(s => s.Level == level);
             slot?.RestoreSlot();
         }
 
         public void RestoreAllSpellSlots()
         {
-            foreach (var slot in SpellSlots)
+            foreach (var slot in _spellSlots)
                 slot.RestoreAll();
         }
 
@@ -214,10 +238,10 @@ namespace DnD_Dynamics.Models
             {
                 for (int i = 0; i < slots.Length; i++)
                 {
-                    if (i < SpellSlots.Count)
+                    if (i < _spellSlots.Count)
                     {
-                        SpellSlots[i].MaxSlots = slots[i];
-                        SpellSlots[i].UsedSlots = Math.Min(SpellSlots[i].UsedSlots, slots[i]);
+                        _spellSlots[i].MaxSlots = slots[i];
+                        _spellSlots[i].UsedSlots = Math.Min(_spellSlots[i].UsedSlots, slots[i]);
                     }
                 }
             }
@@ -233,23 +257,9 @@ namespace DnD_Dynamics.Models
         {
             int maxPrepared = characterLevel + spellcastingModifier;
 
-            return PreparedSpellIds.Count < maxPrepared;
+            return _preparedSpellIds.Count < maxPrepared;
         }
 
         public int GetMaxPreparedSpells(int characterLevel, int spellcastingModifier) => Math.Max(1, characterLevel + spellcastingModifier);
-
-        public Spellbook Clone()
-        {
-            var clone = new Spellbook();
-            clone.KnownSpellIds = new List<string>(KnownSpellIds);
-            clone.PreparedSpellIds = new List<string>(PreparedSpellIds);
-
-            for (int i = 0; i < SpellSlots.Count && i < clone.SpellSlots.Count; i++)
-            {
-                clone.SpellSlots[i] = SpellSlots[i].Clone();
-            }
-
-            return clone;
-        }
     }
 }
