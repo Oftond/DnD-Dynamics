@@ -31,9 +31,9 @@ public class CharacterData
     public string RaceId { get; set; } = string.Empty;
     public string ClassId { get; set; } = string.Empty;
 
-    [Serialize] private CharacterRace _raceData;
+    [NonSerialized] private CharacterRace _raceData;
 
-    [Serialize] private CharacterClass _classData;
+    [NonSerialized] private CharacterClass _classData;
 
     public CharacterStats BaseStats { get; set; } = new CharacterStats();
     public CharacterStats BonusStats { get; set; } = new CharacterStats();
