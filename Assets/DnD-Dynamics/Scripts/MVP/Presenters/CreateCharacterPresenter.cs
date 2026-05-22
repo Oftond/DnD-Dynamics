@@ -110,12 +110,12 @@ namespace DnD_Dynamics.MVP.Presenter
 
             var stats = new CharacterStats
             {
-                Strength = Math.Clamp(strength, 0, 30),
-                Dexterity = Math.Clamp(dexterity, 0, 30),
-                Constitution = Math.Clamp(constitution, 0, 30),
-                Intelligence = Math.Clamp(intelligence, 0, 30),
-                Wisdom = Math.Clamp(wisdom, 0, 30),
-                Charisma = Math.Clamp(charisma, 0, 30)
+                Strength = Math.Clamp(strength, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE),
+                Dexterity = Math.Clamp(dexterity, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE),
+                Constitution = Math.Clamp(constitution, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE),
+                Intelligence = Math.Clamp(intelligence, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE),
+                Wisdom = Math.Clamp(wisdom, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE),
+                Charisma = Math.Clamp(charisma, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE)
             };
 
             var character = await _model.CreateCharacterAsync(name, race, characterClass, stats);

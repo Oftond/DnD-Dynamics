@@ -13,8 +13,8 @@ public static class Constants
     public const int DEFAULT_WISDOM = 10;
     public const int DEFAULT_CHARISMA = 10;
 
-    public const int MIN_ABILITY_SCORE = 3;
-    public const int MAX_ABILITY_SCORE = 20;
+    public const int MIN_ABILITY_SCORE = 0;
+    public const int MAX_ABILITY_SCORE = 30;
 
     public const int MAX_LEVEL = 20;
 

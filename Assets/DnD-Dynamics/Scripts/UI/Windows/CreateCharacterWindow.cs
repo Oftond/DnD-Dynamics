@@ -143,7 +143,7 @@ namespace DnD_Dynamics.UI.Windows
 
                 if (!ValidateStats(strength, dexterity, constitution, intelligence, wisdom, charisma))
                 {
-                    ShowError("Характеристики должны быть от 3 до 20");
+                    ShowError($"Характеристики должны быть от {Constants.MIN_ABILITY_SCORE} до {Constants.MAX_ABILITY_SCORE}");
                     return;
                 }
 
@@ -168,7 +168,7 @@ namespace DnD_Dynamics.UI.Windows
         private int GetStatValue(TMP_InputField input, int defaultValue)
         {
             if (input != null && int.TryParse(input.text, out int value))
-                return Math.Clamp(value, 3, 20);
+                return Math.Clamp(value, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
 
             return defaultValue;
         }
@@ -176,10 +176,8 @@ namespace DnD_Dynamics.UI.Windows
         private bool ValidateStats(params int[] stats)
         {
             foreach (var stat in stats)
-            {
-                if (stat < 3 || stat > 20)
+                if (stat < Constants.MIN_ABILITY_SCORE || stat > Constants.MAX_ABILITY_SCORE)
                     return false;
-            }
 
             return true;
         }

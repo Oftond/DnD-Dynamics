@@ -32,12 +32,21 @@ public class CharacterData
     public string RaceId { get; set; } = string.Empty;
     public string ClassId { get; set; } = string.Empty;
 
-    [NonSerialized] private CharacterRace _raceData;
+    private CharacterRace _raceData;
 
-    [NonSerialized] private CharacterClass _classData;
+    private CharacterClass _classData;
 
     public CharacterStats BaseStats { get; set; } = new CharacterStats();
-    public CharacterStats BonusStats { get; set; } = new CharacterStats();
+
+    public CharacterStats BonusStats { get; set; } = new CharacterStats
+    {
+        Strength = 0,
+        Dexterity = 0,
+        Constitution = 0,
+        Intelligence = 0,
+        Wisdom = 0,
+        Charisma = 0
+    };
 
     public int CurrentHp { get; set; }
     public int TemporaryHp { get; set; }
@@ -193,12 +202,12 @@ public class CharacterData
         total.Wisdom += BonusStats.Wisdom;
         total.Charisma += BonusStats.Charisma;
 
-        total.Strength = Math.Clamp(total.Strength, 1, 30);
-        total.Dexterity = Math.Clamp(total.Dexterity, 1, 30);
-        total.Constitution = Math.Clamp(total.Constitution, 1, 30);
-        total.Intelligence = Math.Clamp(total.Intelligence, 1, 30);
-        total.Wisdom = Math.Clamp(total.Wisdom, 1, 30);
-        total.Charisma = Math.Clamp(total.Charisma, 1, 30);
+        total.Strength = Math.Clamp(total.Strength, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
+        total.Dexterity = Math.Clamp(total.Dexterity, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
+        total.Constitution = Math.Clamp(total.Constitution, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
+        total.Intelligence = Math.Clamp(total.Intelligence, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
+        total.Wisdom = Math.Clamp(total.Wisdom, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
+        total.Charisma = Math.Clamp(total.Charisma, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
 
         return total;
     }
