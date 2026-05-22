@@ -1,11 +1,11 @@
-using DnD_Dynamics.Models;
 using DnD_Dynamics.Services;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using UnityEngine;
 using Zenject;
+
 
 namespace DnD_Dynamics.MVP.Model
 {
@@ -13,6 +13,7 @@ namespace DnD_Dynamics.MVP.Model
     {
         private readonly IDataService _dataService;
         private List<CharacterData> _characters = new();
+        private bool _isLoaded;
 
         public event Action<List<CharacterUIData>> OnCharactersChanged;
         public event Action<CharacterUIData> OnCharacterUpdated;
@@ -25,14 +26,27 @@ namespace DnD_Dynamics.MVP.Model
 
         public async Task LoadCharactersAsync()
         {
-            _characters = await _dataService.LoadCharactersAsync();
+            if (_isLoaded)
+            {
+                Debug.Log("Characters already loaded");
+                return;
+            }
+
+            _characters = await _dataService.GetCharactersAsync();
 
             if (_characters == null)
                 _characters = new List<CharacterData>();
 
             foreach (var character in _characters)
+            {
                 character.InitializeSpellbook(_dataService);
 
+                await character.InitializeClassAsync(_dataService);
+
+                await character.InitializeRaceAsync(_dataService);
+            }
+
+            _isLoaded = true;
             NotifyCharactersChanged();
         }
 

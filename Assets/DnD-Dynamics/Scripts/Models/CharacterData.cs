@@ -3,6 +3,7 @@ using DnD_Dynamics.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.VisualScripting;
 using Zenject;
 using Debug = UnityEngine.Debug;
@@ -137,6 +138,30 @@ public class CharacterData
     private void InitializeAllSkills() => Skills = _skillManager.CreateCharacterSkills();
 
     public void InitializeSpellbook(IDataService dataService) => Spellbook.Initialize(dataService);
+
+    public async Task InitializeRaceAsync(IDataService dataService)
+    {
+        if (!string.IsNullOrEmpty(RaceId))
+        {
+            var races = await dataService.GetRacesAsync();
+            _raceData = races.Find(r => r.Id == RaceId);
+
+            if (_raceData == null)
+                Debug.LogWarning($"Race not found for ID: {RaceId}");
+        }
+    }
+
+    public async Task InitializeClassAsync(IDataService dataService)
+    {
+        if (!string.IsNullOrEmpty(ClassId))
+        {
+            var classes = await dataService.GetClassesAsync();
+            _classData = classes.Find(c => c.Id == ClassId);
+
+            if (_classData == null)
+                Debug.LogWarning($"Class not found for ID: {ClassId}");
+        }
+    }
 
     public Skill GetSkill(string id) => AllSkills.Find(s => s.Id == id);
 

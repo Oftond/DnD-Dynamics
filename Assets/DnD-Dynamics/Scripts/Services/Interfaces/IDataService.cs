@@ -73,7 +73,7 @@ namespace DnD_Dynamics.Services
 
         Task SaveCharactersAsync(List<CharacterData> characters);
 
-        Task<List<CharacterData>> LoadCharactersAsync();
+        Task<List<CharacterData>> GetCharactersAsync();
 
         Task DeleteCharacter(string characterId);
 

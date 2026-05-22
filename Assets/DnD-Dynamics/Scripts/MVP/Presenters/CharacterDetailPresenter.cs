@@ -24,6 +24,7 @@ public class CharacterDetailPresenter : BaseCharacterPresenter
     public void SelectCharacter(string characterId)
     {
         _selectedCharacter = _model.GetCharacter(characterId);
+
         if (_selectedCharacter != null)
         {
             _view?.DisplayCharacterDetails(_selectedCharacter);

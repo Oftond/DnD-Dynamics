@@ -19,6 +19,7 @@ namespace DnD_Dynamics.Services
         private readonly Lazy<Task<List<CharacterRace>>> _lazyRaces;
         private readonly Lazy<Task<List<CharacterClass>>> _lazyClasses;
         private readonly Lazy<Task<List<SkillData>>> _lazySkills;
+        private readonly Lazy<Task<List<CharacterData>>> _lazyCharacters;
 
         private List<Spell> _userSpells = new();
         private List<Item> _userItems = new();
@@ -77,6 +78,7 @@ namespace DnD_Dynamics.Services
             _lazyRaces = new Lazy<Task<List<CharacterRace>>>(() => LoadRacesAsync());
             _lazyClasses = new Lazy<Task<List<CharacterClass>>>(() => LoadClassesAsync());
             _lazySkills = new Lazy<Task<List<SkillData>>>(() => LoadSkillsAsync());
+            _lazyCharacters = new Lazy<Task<List<CharacterData>>>(() => LoadAllCharactersAsync());
 
             LoadUserData();
         }
@@ -97,6 +99,15 @@ namespace DnD_Dynamics.Services
                 Debug.LogError($"Ошибка загрузки {key}: {ex.Message}");
             }
             return defaultValue;
+        }
+
+        private async Task<List<CharacterData>> LoadAllCharactersAsync()
+        {
+            var characters = await Task.Run(() => LoadFromPersistent<List<CharacterData>>(CHARACTERS_KEY) ?? new List<CharacterData>());
+
+            Debug.Log($"Loaded {characters.Count} characters from disk");
+
+            return characters;
         }
 
         private async Task SaveToPersistentAsync<T>(string key, T data)
@@ -671,14 +682,11 @@ namespace DnD_Dynamics.Services
             await SaveToPersistentAsync(CHARACTERS_KEY, _userCharacters);
         }
 
-        public async Task<List<CharacterData>> LoadCharactersAsync()
-        {
-            return await Task.Run(() => LoadFromPersistent<List<CharacterData>>(CHARACTERS_KEY) ?? new List<CharacterData>());
-        }
+        public Task<List<CharacterData>> GetCharactersAsync() => _lazyCharacters.Value;
 
         public async Task DeleteCharacter(string characterId)
         {
-            await LoadCharactersAsync();
+            await LoadAllCharactersAsync();
 
             _userCharacters.RemoveAll(c => c.Id == characterId);
             await SaveToPersistentAsync(CHARACTERS_KEY, _userCharacters).ConfigureAwait(false);

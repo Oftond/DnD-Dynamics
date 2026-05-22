@@ -1,11 +1,12 @@
-﻿using UnityEngine;
-using Zenject;
+﻿using DnD_Dynamics.Models;
 using DnD_Dynamics.MVP.Model;
-using DnD_Dynamics.Models;
-using DnD_Dynamics.UI.Windows;
 using DnD_Dynamics.MVP.Presenter;
-using TMPro;
+using DnD_Dynamics.UI.Windows;
 using System.Threading.Tasks;
+using TMPro;
+using UnityEngine;
+using UnityEngine.TextCore.Text;
+using Zenject;
 
 namespace DnD_Dynamics.UI
 {
@@ -81,6 +82,9 @@ namespace DnD_Dynamics.UI
         private void OnCharacterSelected(string characterId)
         {
             _characterListPresenter.SelectCharacter(characterId);
+
+            _characterDetailPresenter.SelectCharacter(characterId);
+
             ShowCharacterDetail();
         }
 
