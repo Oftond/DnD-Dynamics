@@ -1,21 +1,24 @@
+using DnD_Dynamics.Services;
 using System.Collections.Generic;
-using UnityEngine;
+using Zenject;
 
-public static class SkillManager
+public class SkillManager
 {
-    private static List<SkillData> _allSkillsData;
+    [Inject] private IGameDataService _gameDataService;
 
-    public static List<SkillData> GetAllSkillsData()
+    private List<SkillData> _allSkillsData;
+
+    public List<SkillData> GetAllSkillsData()
     {
         if (_allSkillsData == null || _allSkillsData.Count == 0)
         {
-            _allSkillsData = GameDataService.Instance.LoadSkills();
+            _allSkillsData = _gameDataService.LoadSkills();
         }
 
         return _allSkillsData;
     }
 
-    public static List<Skill> CreateCharacterSkills()
+    public List<Skill> CreateCharacterSkills()
     {
         var skills = new List<Skill>();
         var skillsData = GetAllSkillsData();
@@ -35,11 +38,11 @@ public static class SkillManager
         return skills;
     }
 
-    public static SkillData GetSkillDataById(string id)
+    public SkillData GetSkillDataById(string id)
     {
         var skills = GetAllSkillsData();
         return skills.Find(s => s.Id == id);
     }
 
-    public static List<SkillData> GetSkillsByAbility(CharacterAbility ability) => GameDataService.Instance.GetSkillsByAbility(ability);
+    public List<SkillData> GetSkillsByAbility(CharacterAbility ability) => _gameDataService.GetSkillsByAbility(ability);
 }

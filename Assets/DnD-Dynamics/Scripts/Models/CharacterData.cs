@@ -1,22 +1,52 @@
+using DnD_Dynamics.Models;
+using DnD_Dynamics.Services;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using UnityEngine;
+using System.Threading.Tasks;
+using Unity.VisualScripting;
+using Zenject;
 using Debug = UnityEngine.Debug;
+
+public enum CharacterAbility
+{
+    Strength,
+    Dexterity,
+    Constitution,
+    Intelligence,
+    Wisdom,
+    Charisma
+}
 
 [Serializable]
 public class CharacterData
 {
+    [JsonIgnore]
+    [Inject] private SkillManager _skillManager;
+
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Name { get; set; } = string.Empty;
     public int Level { get; set; } = 1;
     public int ExperiencePoints { get; set; } = 0;
 
-    public CharacterRace Race { get; set; } = CharacterRace.Human;
-    public CharacterClass Class { get; set; } = CharacterClass.Fighter;
+    public string RaceId { get; set; } = string.Empty;
+    public string ClassId { get; set; } = string.Empty;
+
+    private CharacterRace _raceData;
+
+    private CharacterClass _classData;
 
     public CharacterStats BaseStats { get; set; } = new CharacterStats();
-    public CharacterStats BonusStats { get; set; } = new CharacterStats();
+
+    public CharacterStats BonusStats { get; set; } = new CharacterStats
+    {
+        Strength = 0,
+        Dexterity = 0,
+        Constitution = 0,
+        Intelligence = 0,
+        Wisdom = 0,
+        Charisma = 0
+    };
 
     public int CurrentHp { get; set; }
     public int TemporaryHp { get; set; }
@@ -34,21 +64,20 @@ public class CharacterData
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
     public List<Skill> Skills { get; set; } = new List<Skill>();
-
     public Spellbook Spellbook { get; set; } = new Spellbook();
     public CharacterAbility SpellcastingAbility { get; set; } = CharacterAbility.Intelligence;
-
     public SerializableInventory SerializableInventory { get; set; } = new SerializableInventory();
 
     private Inventory _inventory;
 
+    [JsonIgnore]
     public Inventory Inventory
     {
         get
         {
             if (_inventory == null && SerializableInventory != null)
             {
-                _inventory = SerializableInventory.ToInventory(this);
+                _inventory = Inventory.FromSerializable(SerializableInventory, this);
             }
             return _inventory;
         }
@@ -58,8 +87,30 @@ public class CharacterData
             if (_inventory != null)
             {
                 _inventory.SetCharacter(this);
-                SerializableInventory = SerializableInventory.FromInventory(_inventory);
+                SerializableInventory = _inventory.ToSerializable();
             }
+        }
+    }
+
+    [JsonIgnore]
+    public CharacterRace Race
+    {
+        get => _raceData;
+        set
+        {
+            _raceData = value;
+            RaceId = value?.Id ?? string.Empty;
+        }
+    }
+
+    [JsonIgnore]
+    public CharacterClass Class
+    {
+        get => _classData;
+        set
+        {
+            _classData = value;
+            ClassId = value?.Id ?? string.Empty;
         }
     }
 
@@ -82,18 +133,44 @@ public class CharacterData
 
     public int SpellAttackBonus => ProficiencyBonus + TotalStats.GetModifier(SpellcastingAbility);
 
+    [JsonIgnore]
     public List<Skill> AllSkills
     {
         get
         {
             if (Skills.Count == 0)
                 InitializeAllSkills();
-
             return Skills;
         }
     }
 
-    private void InitializeAllSkills() => Skills = SkillManager.CreateCharacterSkills();
+    private void InitializeAllSkills() => Skills = _skillManager.CreateCharacterSkills();
+
+    public void InitializeSpellbook(IDataService dataService) => Spellbook.Initialize(dataService);
+
+    public async Task InitializeRaceAsync(IDataService dataService)
+    {
+        if (!string.IsNullOrEmpty(RaceId))
+        {
+            var races = await dataService.GetRacesAsync();
+            _raceData = races.Find(r => r.Id == RaceId);
+
+            if (_raceData == null)
+                Debug.LogWarning($"Race not found for ID: {RaceId}");
+        }
+    }
+
+    public async Task InitializeClassAsync(IDataService dataService)
+    {
+        if (!string.IsNullOrEmpty(ClassId))
+        {
+            var classes = await dataService.GetClassesAsync();
+            _classData = classes.Find(c => c.Id == ClassId);
+
+            if (_classData == null)
+                Debug.LogWarning($"Class not found for ID: {ClassId}");
+        }
+    }
 
     public Skill GetSkill(string id) => AllSkills.Find(s => s.Id == id);
 
@@ -108,12 +185,15 @@ public class CharacterData
     {
         var total = BaseStats.Clone();
 
-        total.Strength += Race.GetStrengthBonus();
-        total.Dexterity += Race.GetDexterityBonus();
-        total.Constitution += Race.GetConstitutionBonus();
-        total.Intelligence += Race.GetIntelligenceBonus();
-        total.Wisdom += Race.GetWisdomBonus();
-        total.Charisma += Race.GetCharismaBonus();
+        if (Race != null)
+        {
+            total.Strength += Race.GetAbilityBonus(CharacterAbility.Strength);
+            total.Dexterity += Race.GetAbilityBonus(CharacterAbility.Dexterity);
+            total.Constitution += Race.GetAbilityBonus(CharacterAbility.Constitution);
+            total.Intelligence += Race.GetAbilityBonus(CharacterAbility.Intelligence);
+            total.Wisdom += Race.GetAbilityBonus(CharacterAbility.Wisdom);
+            total.Charisma += Race.GetAbilityBonus(CharacterAbility.Charisma);
+        }
 
         total.Strength += BonusStats.Strength;
         total.Dexterity += BonusStats.Dexterity;
@@ -122,12 +202,12 @@ public class CharacterData
         total.Wisdom += BonusStats.Wisdom;
         total.Charisma += BonusStats.Charisma;
 
-        total.Strength = Math.Clamp(total.Strength, 1, 30);
-        total.Dexterity = Math.Clamp(total.Dexterity, 1, 30);
-        total.Constitution = Math.Clamp(total.Constitution, 1, 30);
-        total.Intelligence = Math.Clamp(total.Intelligence, 1, 30);
-        total.Wisdom = Math.Clamp(total.Wisdom, 1, 30);
-        total.Charisma = Math.Clamp(total.Charisma, 1, 30);
+        total.Strength = Math.Clamp(total.Strength, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
+        total.Dexterity = Math.Clamp(total.Dexterity, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
+        total.Constitution = Math.Clamp(total.Constitution, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
+        total.Intelligence = Math.Clamp(total.Intelligence, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
+        total.Wisdom = Math.Clamp(total.Wisdom, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
+        total.Charisma = Math.Clamp(total.Charisma, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
 
         return total;
     }
@@ -135,7 +215,7 @@ public class CharacterData
     private int CalculateMaxHp()
     {
         var conModifier = TotalStats.GetModifier(CharacterAbility.Constitution);
-        var hitDice = Class.GetHitDice();
+        var hitDice = Class?.GetHitDice() ?? 8;
 
         if (Level == 1)
         {
@@ -143,7 +223,6 @@ public class CharacterData
         }
 
         var averageHp = (hitDice / 2) + 1;
-
         return hitDice + conModifier + (Level - 1) * (averageHp + conModifier);
     }
 
@@ -166,7 +245,6 @@ public class CharacterData
         }
 
         UpdatedAt = DateTime.Now;
-
         return CurrentHp;
     }
 
@@ -175,18 +253,13 @@ public class CharacterData
         amount = Math.Max(1, amount);
         CurrentHp = Math.Min(MaxHp, CurrentHp + amount);
         UpdatedAt = DateTime.Now;
-
         return CurrentHp;
     }
 
     public void LevelUp()
     {
         if (Level >= 20) return;
-
         Level++;
-
-        var oldMaxHp = MaxHp;
-        CurrentHp = MaxHp;
 
         UpdatedAt = DateTime.Now;
     }
@@ -236,8 +309,8 @@ public class CharacterData
         {
             Id = Id,
             Name = Name,
-            ClassName = Class.GetDisplayName(),
-            RaceName = Race.GetDisplayName(),
+            ClassName = Class?.GetDisplayName() ?? "Неизвестный класс",
+            RaceName = Race?.GetDisplayName() ?? "Неизвестная раса",
             Level = Level,
             CurrentHp = CurrentHp,
             MaxHp = MaxHp,
@@ -277,29 +350,23 @@ public class CharacterUIData
     public int CurrentHp;
     public int MaxHp;
     public int ArmorClass;
-
     public int InitiativeBonus;
-
     public int Strength;
     public int Dexterity;
     public int Constitution;
     public int Intelligence;
     public int Wisdom;
     public int Charisma;
-
     public int StrengthModifier;
     public int DexterityModifier;
     public int ConstitutionModifier;
     public int IntelligenceModifier;
     public int WisdomModifier;
     public int CharismaModifier;
-
     public int ProficiencyBonus;
-
     public int Gold;
     public int Silver;
     public int Copper;
-
     public string PortraitPath;
     public string Backstory;
     public string Notes;

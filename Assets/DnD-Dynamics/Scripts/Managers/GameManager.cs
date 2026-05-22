@@ -1,35 +1,38 @@
+using DnD_Dynamics.UI;
 using UnityEngine;
 using Zenject;
 
 public class GameManager : MonoBehaviour, IInitializable
 {
-    [Inject] private UIManager _uiManager;
+    [Inject] private UIHandler _uiHandler;
 
-    public UIManager UIManager => _uiManager;
+    public UIHandler UIHandler => _uiHandler;
 
     public void Initialize()
     {
-        Debug.Log("GameManager initialized");
+        Debug.Log("GameHandler initialized");
 
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
-        if (_uiManager == null)
+        if (_uiHandler == null)
         {
-            Debug.LogError("UIManager not found! Creating default...");
-            CreateDefaultUIManager();
+            Debug.LogError("UIHandler not found! Creating default...");
+            CreateDefaultUIHandler();
         }
 
-        if (_uiManager != null)
+        if (_uiHandler != null)
         {
-            _uiManager.ShowMainMenu();
+            _uiHandler.ShowMainMenu();
         }
     }
 
-    private void CreateDefaultUIManager()
+    private void CreateDefaultUIHandler()
     {
-        var uiManagerObj = new GameObject("UIManager");
-        _uiManager = uiManagerObj.AddComponent<UIManager>();
-        DontDestroyOnLoad(uiManagerObj);
+        var uiHandlerObj = new GameObject("UIHandler");
+
+        _uiHandler = uiHandlerObj.AddComponent<UIHandler>();
+
+        DontDestroyOnLoad(uiHandlerObj);
     }
 
     private void OnApplicationQuit()

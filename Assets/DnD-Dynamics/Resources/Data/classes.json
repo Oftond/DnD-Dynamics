@@ -1,0 +1,145 @@
+[
+    {
+      "id": "barbarian",
+      "name": "Варвар",
+      "nameEng": "Barbarian",
+      "description": "Дикий воин, чья сила зависит от ярости. Полагается на интуицию и физическую мощь, способен игнорировать смертельные раны. Первопроходец, воин, дикарь.",
+      "hitDice": 12,
+      "primaryAbility": "Strength",
+      "savingThrows": ["Strength", "Constitution"],
+      "casterType": "None",
+      "source": "Player's Handbook"
+    },
+    {
+      "id": "bard",
+      "name": "Бард",
+      "nameEng": "Bard",
+      "description": "Мастер слова и песни, вдохновляющий союзников и ослабляющий врагов. Универсальный заклинатель, черпающий магию в искусстве.",
+      "hitDice": 8,
+      "primaryAbility": "Charisma",
+      "savingThrows": ["Dexterity", "Charisma"],
+      "casterType": "FullCaster",
+      "source": "Player's Handbook"
+    },
+    {
+      "id": "cleric",
+      "name": "Жрец",
+      "nameEng": "Cleric",
+      "description": "Священный воин, обладающий божественной магией. Может как исцелять союзников, так и наносить сокрушительные удары по врагам.",
+      "hitDice": 8,
+      "primaryAbility": "Wisdom",
+      "savingThrows": ["Wisdom", "Charisma"],
+      "casterType": "FullCaster",
+      "source": "Player's Handbook"
+    },
+    {
+      "id": "druid",
+      "name": "Друид",
+      "nameEng": "Druid",
+      "description": "Хранитель природы, черпающий силу в первобытной магии мира. Способен превращаться в животных, повелевать стихиями и исцелять.",
+      "hitDice": 8,
+      "primaryAbility": "Wisdom",
+      "savingThrows": ["Intelligence", "Wisdom"],
+      "casterType": "FullCaster",
+      "source": "Player's Handbook"
+    },
+    {
+      "id": "fighter",
+      "name": "Воин",
+      "nameEng": "Fighter",
+      "description": "Мастер боя, владеющий всеми видами оружия и доспехов. Не имеет себе равных в прямом столкновении, способен выдержать огромный урон.",
+      "hitDice": 10,
+      "primaryAbility": "Strength",
+      "savingThrows": ["Strength", "Constitution"],
+      "casterType": "None",
+      "source": "Player's Handbook"
+    },
+    {
+      "id": "monk",
+      "name": "Монах",
+      "nameEng": "Monk",
+      "description": "Воин-аскет, чьё тело — смертоносное оружие. Полагается на скорость, ловкость и внутреннюю энергию ци.",
+      "hitDice": 8,
+      "primaryAbility": "Dexterity",
+      "savingThrows": ["Strength", "Dexterity"],
+      "casterType": "None",
+      "source": "Player's Handbook"
+    },
+    {
+      "id": "paladin",
+      "name": "Паладин",
+      "nameEng": "Paladin",
+      "description": "Священный рыцарь, клятва которого дарует ему божественную силу. Является защитником слабых и карающим мечом для зла.",
+      "hitDice": 10,
+      "primaryAbility": "Strength",
+      "savingThrows": ["Wisdom", "Charisma"],
+      "casterType": "HalfCaster",
+      "source": "Player's Handbook"
+    },
+    {
+      "id": "ranger",
+      "name": "Следопыт",
+      "nameEng": "Ranger",
+      "description": "Охотник и следопыт, одинаково искусный в бою с клинком и луком. Мастер выживания и знаток чудовищ.",
+      "hitDice": 10,
+      "primaryAbility": "Dexterity",
+      "savingThrows": ["Strength", "Dexterity"],
+      "casterType": "HalfCaster",
+      "source": "Player's Handbook"
+    },
+    {
+      "id": "rogue",
+      "name": "Плут",
+      "nameEng": "Rogue",
+      "description": "Мастер скрытности и точных ударов. Полагается на ловкость, хитрость и умение находить уязвимые места врага.",
+      "hitDice": 8,
+      "primaryAbility": "Dexterity",
+      "savingThrows": ["Dexterity", "Intelligence"],
+      "casterType": "None",
+      "source": "Player's Handbook"
+    },
+    {
+      "id": "sorcerer",
+      "name": "Чародей",
+      "nameEng": "Sorcerer",
+      "description": "Носитель врождённой магии, проистекающей из его кровной линии. Может направлять сырую силу заклинаний, изменяя их природу.",
+      "hitDice": 6,
+      "primaryAbility": "Charisma",
+      "savingThrows": ["Constitution", "Charisma"],
+      "casterType": "FullCaster",
+      "source": "Player's Handbook"
+    },
+    {
+      "id": "warlock",
+      "name": "Колдун",
+      "nameEng": "Warlock",
+      "description": "Искатель запретных знаний, заключивший сделку с потусторонним существом. Его магия — дар, полученный ценой служения.",
+      "hitDice": 8,
+      "primaryAbility": "Charisma",
+      "savingThrows": ["Wisdom", "Charisma"],
+      "casterType": "FullCaster",
+      "source": "Player's Handbook"
+    },
+    {
+      "id": "wizard",
+      "name": "Волшебник",
+      "nameEng": "Wizard",
+      "description": "Ученый-маг, постигающий тайны магии через учёбу. Обладает широчайшим арсеналом заклинаний и способен менять реальность.",
+      "hitDice": 6,
+      "primaryAbility": "Intelligence",
+      "savingThrows": ["Intelligence", "Wisdom"],
+      "casterType": "FullCaster",
+      "source": "Player's Handbook"
+    },
+    {
+      "id": "artificer",
+      "name": "Изобретатель",
+      "nameEng": "Artificer",
+      "description": "Гений, оживляющий магией свои изобретения. Может создавать мощные артефакты, зелья и конструкции.",
+      "hitDice": 8,
+      "primaryAbility": "Intelligence",
+      "savingThrows": ["Constitution", "Intelligence"],
+      "casterType": "HalfCaster",
+      "source": "Tasha's Cauldron of Everything"
+    }
+]

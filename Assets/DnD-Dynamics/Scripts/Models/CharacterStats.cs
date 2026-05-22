@@ -14,37 +14,37 @@ public class CharacterStats
     public int Strength
     {
         get => strength;
-        set => strength = Math.Clamp(value, 1, 30);
+        set => strength = Math.Clamp(value, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
     }
 
     public int Dexterity
     {
         get => dexterity;
-        set => dexterity = Math.Clamp(value, 1, 30);
+        set => dexterity = Math.Clamp(value, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
     }
 
     public int Constitution
     {
         get => constitution;
-        set => constitution = Math.Clamp(value, 1, 30);
+        set => constitution = Math.Clamp(value, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
     }
 
     public int Intelligence
     {
         get => intelligence;
-        set => intelligence = Math.Clamp(value, 1, 30);
+        set => intelligence = Math.Clamp(value, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
     }
 
     public int Wisdom
     {
         get => wisdom;
-        set => wisdom = Math.Clamp(value, 1, 30);
+        set => wisdom = Math.Clamp(value, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
     }
 
     public int Charisma
     {
         get => charisma;
-        set => charisma = Math.Clamp(value, 1, 30);
+        set => charisma = Math.Clamp(value, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
     }
 
     public int GetAbility(CharacterAbility ability)
@@ -63,7 +63,7 @@ public class CharacterStats
 
     public void SetAbility(CharacterAbility ability, int value)
     {
-        value = Math.Clamp(value, 1, 20);
+        value = Math.Clamp(value, Constants.MIN_ABILITY_SCORE, Constants.MAX_ABILITY_SCORE);
 
         switch (ability)
         {
