@@ -1,0 +1,190 @@
+[
+    {
+      "id": "goblin",
+      "name": "Гоблин",
+      "nameEng": "Goblin",
+      "description": "Гоблины — маленькие, трусливые гуманоиды, живущие в пещерах и тёмных лесах. Они известны своей жестокостью и любовью к засадам. Часто служат более сильным существам, таким как хобгоблины или гоблины-вожди.",
+      "isHomebrew": false,
+      "isFavorite": false,
+      "size": "Small",
+      "type": "Humanoid",
+      "subtype": "Goblinoid",
+      "alignment": "ChaoticEvil",
+      "armorClass": 15,
+      "hitPoints": 7,
+      "hitDice": "2d6",
+      "walkSpeed": 30,
+      "abilityScores": {
+        "strength": 8,
+        "dexterity": 14,
+        "constitution": 10,
+        "intelligence": 10,
+        "wisdom": 8,
+        "charisma": 8
+      },
+      "savingThrows": [
+        { "ability": "Dexterity", "bonus": 4 }
+      ],
+      "challengeRating": 0.25,
+      "skillProficiencies": [
+        { "skill": "Stealth", "bonus": 6 }
+      ],
+      "damageResistances": [],
+      "damageImmunities": [],
+      "conditionImmunities": [],
+      "damageVulnerabilities": [],
+      "senses": "Тёмное зрение 60 футов",
+      "passivePerception": 9,
+      "languages": "Общий, Гоблинский",
+      "terrains": ["Forest", "Underdark", "Hill"],
+      "traits": [
+        {
+          "name": "Трусливое бегство",
+          "description": "Гоблин может совершать действие Отход как бонусное действие."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Клинок",
+          "description": "Рукопашная атака оружием: +4 к попаданию, досягаемость 5 футов, одна цель. Попадание: 5 (1d6 + 2) рубящего урона.",
+          "attackBonus": 4,
+          "damage": "1d6+2"
+        },
+        {
+          "name": "Лук короткий",
+          "description": "Дальнобойная атака оружием: +4 к попаданию, дистанция 80/320 футов, одна цель. Попадание: 5 (1d6 + 2) колющего урона.",
+          "attackBonus": 4,
+          "damage": "1d6+2"
+        }
+      ],
+      "spells": [],
+      "reactions": []
+    },
+    {
+      "id": "wolf",
+      "name": "Волк",
+      "nameEng": "Wolf",
+      "description": "Волки — свирепые хищники, охотящиеся стаями. Они используют тактику окружения, чтобы одолеть более крупную добычу.",
+      "isHomebrew": false,
+      "isFavorite": false,
+      "size": "Medium",
+      "type": "Beast",
+      "alignment": "Unaligned",
+      "armorClass": 13,
+      "hitPoints": 11,
+      "hitDice": "2d8+2",
+      "walkSpeed": 40,
+      "abilityScores": {
+        "strength": 12,
+        "dexterity": 15,
+        "constitution": 12,
+        "intelligence": 3,
+        "wisdom": 12,
+        "charisma": 6
+      },
+      "savingThrows": [],
+      "challengeRating": 0.25,
+      "skillProficiencies": [
+        { "skill": "Perception", "bonus": 3 },
+        { "skill": "Stealth", "bonus": 4 }
+      ],
+      "damageResistances": [],
+      "damageImmunities": [],
+      "conditionImmunities": [],
+      "damageVulnerabilities": [],
+      "senses": "Тёмное зрение 60 футов",
+      "passivePerception": 13,
+      "languages": "",
+      "terrains": ["Forest", "Hill", "Arctic", "Grassland"],
+      "traits": [
+        {
+          "name": "Тактика стаи",
+          "description": "Волк совершает с преимуществом броски атаки по существу, если хотя бы один союзник волка находится в пределах 5 футов от этого существа и союзник не недееспособен."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Укус",
+          "description": "Рукопашная атака оружием: +4 к попаданию, досягаемость 5 футов, одна цель. Попадание: 6 (2d4 + 2) колющего урона. Если цель — существо, оно должно преуспеть в спасброске Силы со Сл 11, иначе будет сбито с ног.",
+          "attackBonus": 4,
+          "damage": "2d4+2"
+        }
+      ],
+      "spells": [],
+      "reactions": []
+    },
+    {
+      "id": "young_red_dragon",
+      "name": "Молодой красный дракон",
+      "nameEng": "Young Red Dragon",
+      "description": "Молодые красные драконы горды, жестоки и одержимы сокровищами. Они внушают ужас одним своим видом и используют свои смертоносные атаки, чтобы продемонстрировать превосходство.",
+      "isHomebrew": false,
+      "isFavorite": false,
+      "size": "Large",
+      "type": "Dragon",
+      "alignment": "ChaoticEvil",
+      "armorClass": 18,
+      "hitPoints": 178,
+      "hitDice": "17d10+85",
+      "walkSpeed": 40,
+      "flySpeed": 80,
+      "abilityScores": {
+        "strength": 23,
+        "dexterity": 10,
+        "constitution": 21,
+        "intelligence": 14,
+        "wisdom": 11,
+        "charisma": 19
+      },
+      "savingThrows": [
+        { "ability": "Dexterity", "bonus": 4 },
+        { "ability": "Constitution", "bonus": 9 },
+        { "ability": "Wisdom", "bonus": 4 },
+        { "ability": "Charisma", "bonus": 8 }
+      ],
+      "challengeRating": 10,
+      "skillProficiencies": [
+        { "skill": "Perception", "bonus": 8 },
+        { "skill": "Stealth", "bonus": 4 }
+      ],
+      "damageResistances": [],
+      "damageImmunities": [
+        { "type": "Fire", "description": "Сопротивление урону огнём" }
+      ],
+      "conditionImmunities": [],
+      "damageVulnerabilities": [],
+      "senses": "Тёмное зрение 120 футов, Слепое зрение 30 футов",
+      "passivePerception": 18,
+      "languages": "Общий, Драконий",
+      "terrains": ["Mountain", "Hill", "Coast"],
+      "traits": [],
+      "actions": [
+        {
+          "name": "Мультиатака",
+          "description": "Дракон совершает три атаки: одну укусом и две когтями.",
+          "attackBonus": 0,
+          "damage": ""
+        },
+        {
+          "name": "Укус",
+          "description": "Рукопашная атака оружием: +10 к попаданию, досягаемость 10 футов, одна цель. Попадание: 17 (2d10 + 6) колющего урона плюс 3 (1d6) урона огнём.",
+          "attackBonus": 10,
+          "damage": "2d10+6 + 1d6 огнём"
+        },
+        {
+          "name": "Коготь",
+          "description": "Рукопашная атака оружием: +10 к попаданию, досягаемость 5 футов, одна цель. Попадание: 13 (2d6 + 6) рубящего урона.",
+          "attackBonus": 10,
+          "damage": "2d6+6"
+        },
+        {
+          "name": "Дыхание огня",
+          "description": "Дракон выдыхает огонь в 30-футовом конусе. Все существа в этой области должны совершить спасбросок Ловкости со Сл 17, получая 56 (16d6) урона огнём при провале или половину урона при успехе.",
+          "attackBonus": 0,
+          "damage": "16d6"
+        }
+      ],
+      "spells": [],
+      "reactions": []
+    }
+]

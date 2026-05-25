@@ -14,54 +14,55 @@ namespace DnD_Dynamics.UI.Windows
     public class HandbookWindow : MonoBehaviour
     {
         [Header("Tabs")]
-        [SerializeField] private Button spellsTab;
-        [SerializeField] private Button itemsTab;
-        [SerializeField] private Button monstersTab;
-        [SerializeField] private GameObject activeTabIndicator;
+        [SerializeField] private Button _spellsTab;
+        [SerializeField] private Button _itemsTab;
+        [SerializeField] private Button _monstersTab;
 
         [Header("View Mode Toggles")]
-        [SerializeField] private Toggle allModeToggle;
-        [SerializeField] private Toggle favoritesModeToggle;
-        [SerializeField] private Toggle homebrewModeToggle;
-        [SerializeField] private GameObject modeTogglePanel;
+        [SerializeField] private Toggle _allModeToggle;
+        [SerializeField] private Toggle _favoritesModeToggle;
+        [SerializeField] private Toggle _homebrewModeToggle;
 
         [Header("Search & Filter")]
-        [SerializeField] private TMP_InputField searchInput;
-        [SerializeField] private Button filterToggleButton;
-        [SerializeField] private GameObject filterPanel;
+        [SerializeField] private TMP_InputField _searchInput;
+        [SerializeField] private Button _filterToggleButton;
+        [SerializeField] private GameObject _filterPanel;
+        [SerializeField] private GameObject _spellFiltersPanel;
+        [SerializeField] private GameObject _itemFiltersPanel;
+        [SerializeField] private GameObject _monsterFiltersPanel;
 
         [Header("Spell Filters")]
-        [SerializeField] private TMP_Dropdown spellLevelFilter;
-        [SerializeField] private TMP_Dropdown spellSchoolFilter;
-        [SerializeField] private TMP_Dropdown spellClassFilter;
+        [SerializeField] private TMP_Dropdown _spellLevelFilter;
+        [SerializeField] private TMP_Dropdown _spellSchoolFilter;
+        [SerializeField] private TMP_Dropdown _spellClassFilter;
 
         [Header("Item Filters")]
-        [SerializeField] private TMP_Dropdown itemRarityFilter;
-        [SerializeField] private TMP_Dropdown itemTypeFilter;
+        [SerializeField] private TMP_Dropdown _itemRarityFilter;
+        [SerializeField] private TMP_Dropdown _itemTypeFilter;
 
         [Header("Monster Filters")]
-        [SerializeField] private Slider monsterCrMinSlider;
-        [SerializeField] private Slider monsterCrMaxSlider;
-        [SerializeField] private TextMeshProUGUI monsterCrMinText;
-        [SerializeField] private TextMeshProUGUI monsterCrMaxText;
-        [SerializeField] private TMP_Dropdown monsterTypeFilter;
-        [SerializeField] private TMP_Dropdown monsterSizeFilter;
+        [SerializeField] private Slider _monsterCrMinSlider;
+        [SerializeField] private Slider _monsterCrMaxSlider;
+        [SerializeField] private TextMeshProUGUI _monsterCrMinText;
+        [SerializeField] private TextMeshProUGUI _monsterCrMaxText;
+        [SerializeField] private TMP_Dropdown _monsterTypeFilter;
+        [SerializeField] private TMP_Dropdown _monsterSizeFilter;
 
         [Header("Content")]
-        [SerializeField] private Transform contentContainer;
-        [SerializeField] private GameObject cardPrefab;
-        [SerializeField] private ScrollRect scrollRect;
-        [SerializeField] private GameObject emptyStatePanel;
-        [SerializeField] private TextMeshProUGUI emptyStateText;
+        [SerializeField] private Transform _contentContainer;
+        [SerializeField] private GameObject _cardPrefab;
+        [SerializeField] private ScrollRect _scrollRect;
+        [SerializeField] private GameObject _emptyStatePanel;
+        [SerializeField] private TextMeshProUGUI _emptyStateText;
 
         [Header("Details Panel")]
-        [SerializeField] private GameObject detailsPanel;
-        [SerializeField] private TextMeshProUGUI detailsTitle;
-        [SerializeField] private TextMeshProUGUI detailsText;
-        [SerializeField] private Button detailsFavoriteButton;
-        [SerializeField] private Button detailsCloseButton;
-        [SerializeField] private Button editButton;
-        [SerializeField] private Button deleteButton;
+        [SerializeField] private GameObject _detailsPanel;
+        [SerializeField] private TextMeshProUGUI _detailsTitle;
+        [SerializeField] private TextMeshProUGUI _detailsText;
+        [SerializeField] private Button _detailsFavoriteButton;
+        [SerializeField] private Button _detailsCloseButton;
+        [SerializeField] private Button _editButton;
+        [SerializeField] private Button _deleteButton;
 
         private IDataService _dataService;
         private IHandbookFilterService _filterService;
@@ -87,7 +88,7 @@ namespace DnD_Dynamics.UI.Windows
         {
             _allClasses = await _dataService.GetClassesAsync();
 
-            spellClassFilter.ClearOptions();
+            _spellClassFilter.ClearOptions();
             var options = new List<TMP_Dropdown.OptionData> { new TMP_Dropdown.OptionData("Все классы") };
 
             for (int i = 0; i < _allClasses.Count; i++)
@@ -95,7 +96,7 @@ namespace DnD_Dynamics.UI.Windows
                 options.Add(new TMP_Dropdown.OptionData(_allClasses[i].Name));
                 _classIdMap[i + 1] = _allClasses[i].Id;
             }
-            spellClassFilter.AddOptions(options);
+            _spellClassFilter.AddOptions(options);
         }
 
         private async void Start()
@@ -115,17 +116,17 @@ namespace DnD_Dynamics.UI.Windows
 
         private void InitializeTabs()
         {
-            spellsTab.onClick.AddListener(async () => await LoadCategory(HandbookCategory.Spells));
-            itemsTab.onClick.AddListener(async () => await LoadCategory(HandbookCategory.Items));
-            monstersTab.onClick.AddListener(async () => await LoadCategory(HandbookCategory.Monsters));
+            _spellsTab.onClick.AddListener(async () => await LoadCategory(HandbookCategory.Spells));
+            _itemsTab.onClick.AddListener(async () => await LoadCategory(HandbookCategory.Items));
+            _monstersTab.onClick.AddListener(async () => await LoadCategory(HandbookCategory.Monsters));
 
-            searchInput.onValueChanged.AddListener(async (q) => await OnSearchChanged(q));
-            filterToggleButton.onClick.AddListener(() => filterPanel.SetActive(!filterPanel.activeSelf));
+            _searchInput.onValueChanged.AddListener(async (q) => await OnSearchChanged(q));
+            _filterToggleButton.onClick.AddListener(() => _filterPanel.SetActive(!_filterPanel.activeSelf));
         }
 
         private void InitializeViewModes()
         {
-            allModeToggle.onValueChanged.AddListener(async (isOn) =>
+            _allModeToggle.onValueChanged.AddListener(async (isOn) =>
             {
                 if (isOn)
                 {
@@ -134,7 +135,7 @@ namespace DnD_Dynamics.UI.Windows
                     await ApplyFiltersAsync();
                 }
             });
-            favoritesModeToggle.onValueChanged.AddListener(async (isOn) =>
+            _favoritesModeToggle.onValueChanged.AddListener(async (isOn) =>
             {
                 if (isOn)
                 {
@@ -143,7 +144,7 @@ namespace DnD_Dynamics.UI.Windows
                     await ApplyFiltersAsync();
                 }
             });
-            homebrewModeToggle.onValueChanged.AddListener(async (isOn) =>
+            _homebrewModeToggle.onValueChanged.AddListener(async (isOn) =>
             {
                 if (isOn)
                 {
@@ -156,7 +157,7 @@ namespace DnD_Dynamics.UI.Windows
 
         private void InitializeFilters()
         {
-            spellLevelFilter.options = new List<TMP_Dropdown.OptionData>
+            _spellLevelFilter.options = new List<TMP_Dropdown.OptionData>
             {
                 new TMP_Dropdown.OptionData("Все уровни"),
                 new TMP_Dropdown.OptionData("Заговоры"),
@@ -166,9 +167,9 @@ namespace DnD_Dynamics.UI.Windows
                 new TMP_Dropdown.OptionData("7 круг"), new TMP_Dropdown.OptionData("8 круг"),
                 new TMP_Dropdown.OptionData("9 круг")
             };
-            spellLevelFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
+            _spellLevelFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
 
-            spellSchoolFilter.options = new List<TMP_Dropdown.OptionData>
+            _spellSchoolFilter.options = new List<TMP_Dropdown.OptionData>
             {
                 new TMP_Dropdown.OptionData("Все школы"),
                 new TMP_Dropdown.OptionData("Ограждение"), new TMP_Dropdown.OptionData("Призыв"),
@@ -176,19 +177,19 @@ namespace DnD_Dynamics.UI.Windows
                 new TMP_Dropdown.OptionData("Воплощение"), new TMP_Dropdown.OptionData("Иллюзия"),
                 new TMP_Dropdown.OptionData("Некромантия"), new TMP_Dropdown.OptionData("Преобразование")
             };
-            spellSchoolFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
-            spellClassFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
+            _spellSchoolFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
+            _spellClassFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
 
-            itemRarityFilter.options = new List<TMP_Dropdown.OptionData>
+            _itemRarityFilter.options = new List<TMP_Dropdown.OptionData>
             {
                 new TMP_Dropdown.OptionData("Все редкости"),
                 new TMP_Dropdown.OptionData("Обычный"), new TMP_Dropdown.OptionData("Необычный"),
                 new TMP_Dropdown.OptionData("Редкий"), new TMP_Dropdown.OptionData("Очень редкий"),
                 new TMP_Dropdown.OptionData("Легендарный"), new TMP_Dropdown.OptionData("Артефакт")
             };
-            itemRarityFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
+            _itemRarityFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
 
-            itemTypeFilter.options = new List<TMP_Dropdown.OptionData>
+            _itemTypeFilter.options = new List<TMP_Dropdown.OptionData>
             {
                 new TMP_Dropdown.OptionData("Все типы"),
                 new TMP_Dropdown.OptionData("Оружие"), new TMP_Dropdown.OptionData("Доспех"),
@@ -198,23 +199,23 @@ namespace DnD_Dynamics.UI.Windows
                 new TMP_Dropdown.OptionData("Зелье"), new TMP_Dropdown.OptionData("Свиток"),
                 new TMP_Dropdown.OptionData("Инструмент"), new TMP_Dropdown.OptionData("Прочее")
             };
-            itemTypeFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
+            _itemTypeFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
 
-            monsterCrMinSlider.onValueChanged.AddListener(async v => { monsterCrMinText.text = v.ToString("F1"); await ApplyFiltersAsync(); });
-            monsterCrMaxSlider.onValueChanged.AddListener(async v => { monsterCrMaxText.text = v.ToString("F1"); await ApplyFiltersAsync(); });
-            monsterTypeFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
-            monsterSizeFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
+            _monsterCrMinSlider.onValueChanged.AddListener(async v => { _monsterCrMinText.text = v.ToString("F1"); await ApplyFiltersAsync(); });
+            _monsterCrMaxSlider.onValueChanged.AddListener(async v => { _monsterCrMaxText.text = v.ToString("F1"); await ApplyFiltersAsync(); });
+            _monsterTypeFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
+            _monsterSizeFilter.onValueChanged.AddListener(async _ => await ApplyFiltersAsync());
         }
 
         private void InitializeDetailsPanel()
         {
-            detailsCloseButton.onClick.AddListener(() => detailsPanel.SetActive(false));
-            detailsFavoriteButton.onClick.AddListener(() =>
+            _detailsCloseButton.onClick.AddListener(() => _detailsPanel.SetActive(false));
+            _detailsFavoriteButton.onClick.AddListener(() =>
             {
                 if (_selectedItem != null)
                 {
                     _dataService.ToggleFavoriteAsync(_selectedItem.Id, _currentCategory);
-                    detailsFavoriteButton.GetComponent<Image>().color = _selectedItem.IsFavorite ? Color.yellow : Color.gray;
+                    _detailsFavoriteButton.GetComponent<Image>().color = _selectedItem.IsFavorite ? Color.yellow : Color.gray;
                     UpdateCardFavorite(_selectedItem.Id, _selectedItem.IsFavorite);
                 }
             });
@@ -224,8 +225,11 @@ namespace DnD_Dynamics.UI.Windows
         {
             _currentCategory = category;
             _currentViewMode = ViewMode.All;
-            allModeToggle.isOn = true;
+            _allModeToggle.isOn = true;
             ClearCards();
+
+            UpdateFilterPanelsVisibility();
+
             await ApplyFiltersAsync();
             UpdateEmptyStateText();
         }
@@ -238,7 +242,35 @@ namespace DnD_Dynamics.UI.Windows
                 ViewMode.Homebrew => "своих",
                 _ => ""
             };
-            emptyStateText.text = $"Нет {modeText} {GetCategoryDisplayName()}";
+            _emptyStateText.text = $"Нет {modeText} {GetCategoryDisplayName()}";
+        }
+
+        private void UpdateFilterPanelsVisibility()
+        {
+            // Скрываем все панели фильтров
+            if (_spellFiltersPanel != null)
+                _spellFiltersPanel.SetActive(false);
+            if (_itemFiltersPanel != null)
+                _itemFiltersPanel.SetActive(false);
+            if (_monsterFiltersPanel != null)
+                _monsterFiltersPanel.SetActive(false);
+
+            // Показываем нужную панель в зависимости от категории
+            switch (_currentCategory)
+            {
+                case HandbookCategory.Spells:
+                    if (_spellFiltersPanel != null)
+                        _spellFiltersPanel.SetActive(true);
+                    break;
+                case HandbookCategory.Items:
+                    if (_itemFiltersPanel != null)
+                        _itemFiltersPanel.SetActive(true);
+                    break;
+                case HandbookCategory.Monsters:
+                    if (_monsterFiltersPanel != null)
+                        _monsterFiltersPanel.SetActive(true);
+                    break;
+            }
         }
 
         private string GetCategoryDisplayName()
@@ -256,7 +288,7 @@ namespace DnD_Dynamics.UI.Windows
 
         private async Task ApplyFiltersAsync()
         {
-            string searchQuery = searchInput.text;
+            string searchQuery = _searchInput.text;
             List<HandbookEntity> baseItems;
 
             switch (_currentCategory)
@@ -306,9 +338,9 @@ namespace DnD_Dynamics.UI.Windows
             switch (_currentCategory)
             {
                 case HandbookCategory.Spells:
-                    int level = spellLevelFilter.value == 0 ? -1 : spellLevelFilter.value - 1;
-                    SpellSchool? school = spellSchoolFilter.value == 0 ? null : (SpellSchool?)(spellSchoolFilter.value - 1);
-                    string requiredClassId = spellClassFilter.value > 0 && _classIdMap.ContainsKey(spellClassFilter.value) ? _classIdMap[spellClassFilter.value] : null;
+                    int level = _spellLevelFilter.value == 0 ? -1 : _spellLevelFilter.value - 1;
+                    SpellSchool? school = _spellSchoolFilter.value == 0 ? null : (SpellSchool?)(_spellSchoolFilter.value - 1);
+                    string requiredClassId = _spellClassFilter.value > 0 && _classIdMap.ContainsKey(_spellClassFilter.value) ? _classIdMap[_spellClassFilter.value] : null;
 
                     var spells = _currentItems.Cast<Spell>().ToList();
                     var filteredSpells = _filterService.FilterSpells(spells, level == -1 ? null : level, school, requiredClassId);
@@ -316,8 +348,8 @@ namespace DnD_Dynamics.UI.Windows
                     break;
 
                 case HandbookCategory.Items:
-                    ItemRarity? rarity = itemRarityFilter.value == 0 ? null : (ItemRarity?)(itemRarityFilter.value - 1);
-                    ItemType? type = itemTypeFilter.value == 0 ? null : (ItemType?)(itemTypeFilter.value - 1);
+                    ItemRarity? rarity = _itemRarityFilter.value == 0 ? null : (ItemRarity?)(_itemRarityFilter.value - 1);
+                    ItemType? type = _itemTypeFilter.value == 0 ? null : (ItemType?)(_itemTypeFilter.value - 1);
 
                     var items = _currentItems.Cast<Item>().ToList();
                     var rarities = rarity.HasValue ? new List<ItemRarity> { rarity.Value } : null;
@@ -327,10 +359,10 @@ namespace DnD_Dynamics.UI.Windows
                     break;
 
                 case HandbookCategory.Monsters:
-                    float minCr = monsterCrMinSlider.value;
-                    float maxCr = monsterCrMaxSlider.value;
-                    MonsterType? monsterType = monsterTypeFilter.value == 0 ? null : (MonsterType?)(monsterTypeFilter.value - 1);
-                    MonsterSize? size = monsterSizeFilter.value == 0 ? null : (MonsterSize?)(monsterSizeFilter.value - 1);
+                    float minCr = _monsterCrMinSlider.value;
+                    float maxCr = _monsterCrMaxSlider.value;
+                    MonsterType? monsterType = _monsterTypeFilter.value == 0 ? null : (MonsterType?)(_monsterTypeFilter.value - 1);
+                    MonsterSize? size = _monsterSizeFilter.value == 0 ? null : (MonsterSize?)(_monsterSizeFilter.value - 1);
 
                     var monsters = _currentItems.Cast<Monster>().ToList();
                     var filteredMonsters = _filterService.FilterMonsters(monsters, minCr, maxCr, monsterType, size);
@@ -343,7 +375,7 @@ namespace DnD_Dynamics.UI.Windows
             }
 
             DisplayItems(filtered);
-            emptyStatePanel.SetActive(filtered.Count == 0);
+            _emptyStatePanel?.SetActive(filtered.Count == 0);
         }
 
         private void DisplayItems(List<HandbookEntity> items)
@@ -352,7 +384,7 @@ namespace DnD_Dynamics.UI.Windows
 
             foreach (var item in items)
             {
-                var cardObj = Instantiate(cardPrefab, contentContainer);
+                var cardObj = Instantiate(_cardPrefab, _contentContainer);
                 var card = cardObj.GetComponent<HandbookCard>();
                 card.Setup(item);
                 card.OnClick += ShowDetails;
@@ -364,16 +396,16 @@ namespace DnD_Dynamics.UI.Windows
                 _cards[item.Id] = card;
             }
 
-            scrollRect.verticalNormalizedPosition = 1f;
+            _scrollRect.verticalNormalizedPosition = 1f;
         }
 
         private void ShowDetails(HandbookEntity item)
         {
             _selectedItem = item;
-            detailsTitle.text = item.Name;
-            detailsText.text = BuildDescriptionText(item);
-            detailsFavoriteButton.GetComponent<Image>().color = item.IsFavorite ? Color.yellow : Color.gray;
-            detailsPanel.SetActive(true);
+            _detailsTitle.text = item.Name;
+            _detailsText.text = BuildDescriptionText(item);
+            _detailsFavoriteButton.GetComponent<Image>().color = item.IsFavorite ? Color.yellow : Color.gray;
+            _detailsPanel.SetActive(true);
         }
 
         private string BuildDescriptionText(HandbookEntity item)

@@ -131,29 +131,40 @@ namespace DnD_Dynamics.Services
         {
             var tcs = new TaskCompletionSource<T>();
 
-            ResourceRequest request = Resources.LoadAsync<TextAsset>(path);
-            request.completed += (op) =>
+            await UnityMainThreadDispatcher.Instance().EnqueueAsync(() =>
             {
                 try
                 {
-                    var asset = request.asset as TextAsset;
-                    if (asset != null)
+                    var request = Resources.LoadAsync<TextAsset>(path);
+                    request.completed += (op) =>
                     {
-                        var result = JsonConvert.DeserializeObject<T>(asset.text);
-                        tcs.SetResult(result);
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"Файл {path}.json не найден в Resources");
-                        tcs.SetResult(null);
-                    }
+                        try
+                        {
+                            var asset = request.asset as TextAsset;
+                            if (asset != null)
+                            {
+                                var result = JsonConvert.DeserializeObject<T>(asset.text);
+                                tcs.SetResult(result);
+                            }
+                            else
+                            {
+                                Debug.LogWarning($"Файл {path}.json не найден в Resources");
+                                tcs.SetResult(null);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.LogError($"Ошибка десериализации {path}: {ex.Message}");
+                            tcs.SetException(ex);
+                        }
+                    };
                 }
                 catch (Exception ex)
                 {
                     Debug.LogError($"Ошибка загрузки {path}: {ex.Message}");
                     tcs.SetException(ex);
                 }
-            };
+            });
 
             return await tcs.Task;
         }

@@ -129,13 +129,13 @@ TextureImporter:
       name: Button_RL_Background_Yellow_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 502
-        height: 196
+        x: 29
+        y: 29
+        width: 444
+        height: 138
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 89, y: 47, z: 85, w: 85}
       customData: 
       outline: []
       physicsShape: []
@@ -151,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 4c5c18912ac683244b55c77c53e92c4e
     internalID: 0
     vertices: []
     indices: 
