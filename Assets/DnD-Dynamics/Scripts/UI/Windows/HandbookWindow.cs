@@ -247,7 +247,6 @@ namespace DnD_Dynamics.UI.Windows
 
         private void UpdateFilterPanelsVisibility()
         {
-            // Скрываем все панели фильтров
             if (_spellFiltersPanel != null)
                 _spellFiltersPanel.SetActive(false);
             if (_itemFiltersPanel != null)
@@ -255,7 +254,6 @@ namespace DnD_Dynamics.UI.Windows
             if (_monsterFiltersPanel != null)
                 _monsterFiltersPanel.SetActive(false);
 
-            // Показываем нужную панель в зависимости от категории
             switch (_currentCategory)
             {
                 case HandbookCategory.Spells:
@@ -447,6 +445,7 @@ namespace DnD_Dynamics.UI.Windows
         {
             foreach (var card in _cards.Values)
                 Destroy(card.gameObject);
+
             _cards.Clear();
         }
 

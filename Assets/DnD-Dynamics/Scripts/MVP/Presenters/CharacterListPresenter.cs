@@ -1,5 +1,6 @@
 using DnD_Dynamics.MVP.Model;
 using DnD_Dynamics.Services;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -24,21 +25,35 @@ public class CharacterListPresenter : BaseCharacterPresenter
 
     public async Task LoadCharactersAsync()
     {
-        _view?.ShowLoading(true);
-        await _model.LoadCharactersAsync();
-        _view?.ShowLoading(false);
+        if (_view == null)
+            return;
 
-        _view?.DisplayCharacters(_model.GetAllCharacters());
+        _view.ShowLoading(true);
+        try
+        {
+            await _model.LoadCharactersAsync();
+        }
+        catch (Exception ex)
+        {
+            _view.ShowError("Не удалось загрузить персонажей. Проверьте файлы сохранений.");
+        }
+        finally
+        {
+            _view.ShowLoading(false);
+        }
     }
 
     public void SelectCharacter(string characterId)
     {
+        if (string.IsNullOrEmpty(characterId) || _view == null)
+            return;
+
         var character = _model.GetCharacter(characterId);
 
         if (character != null)
-            _view?.DisplayCharacterDetails(character);
+            _view.DisplayCharacterDetails(character);
         else
-            _view?.ShowError("Персонаж не найден");
+            _view.ShowError("Персонаж не найден");
     }
 
     private void OnCharactersChanged(List<CharacterUIData> characters) => _view?.DisplayCharacters(characters);

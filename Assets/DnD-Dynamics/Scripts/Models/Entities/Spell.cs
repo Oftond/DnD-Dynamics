@@ -205,9 +205,11 @@ public class Spell : HandbookEntity
     public string GetComponentsDisplayString()
     {
         var parts = new List<string>();
+
         if ((Components & SpellComponents.Verbal) != 0) parts.Add("Â");
         if ((Components & SpellComponents.Somatic) != 0) parts.Add("Ñ");
         if ((Components & SpellComponents.Material) != 0) parts.Add("Ì");
+
         return string.Join(", ", parts);
     }
 }

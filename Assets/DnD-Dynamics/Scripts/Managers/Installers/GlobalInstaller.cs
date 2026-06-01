@@ -41,6 +41,14 @@ public class GlobalInstaller : MonoInstaller
 
         Container.Bind<ICombatService>().To<CombatService>().AsSingle();
         Container.Bind<DiceRollerService>().AsSingle();
+
+        Container.Bind<ICharacterStatCalculator>().To<CharacterStatCalculator>().AsSingle();
+
+        Container.Bind<ICharacterCombatService>().To<CharacterCombatService>().AsSingle();
+
+        Container.Bind<ICharacterProgressionService>().To<CharacterProgressionService>().AsSingle();
+
+        Container.Bind<ICharacterUiMapper>().To<CharacterUiMapper>().AsSingle();
     }
 
     private void PresentersInstall()

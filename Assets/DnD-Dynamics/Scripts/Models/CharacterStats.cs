@@ -92,6 +92,32 @@ public class CharacterStats
 
     public int GetModifier(CharacterAbility ability) => CalculateModifier(GetAbility(ability));
 
+    public CharacterStats Add(CharacterStats other)
+    {
+        if (other == null) return this;
+
+        Strength += other.Strength;
+        Dexterity += other.Dexterity;
+        Constitution += other.Constitution;
+        Intelligence += other.Intelligence;
+        Wisdom += other.Wisdom;
+        Charisma += other.Charisma;
+
+        return this;
+    }
+
+    public CharacterStats Clamp(int min, int max)
+    {
+        strength = Math.Clamp(strength, min, max);
+        dexterity = Math.Clamp(dexterity, min, max);
+        constitution = Math.Clamp(constitution, min, max);
+        intelligence = Math.Clamp(intelligence, min, max);
+        wisdom = Math.Clamp(wisdom, min, max);
+        charisma = Math.Clamp(charisma, min, max);
+
+        return this;
+    }
+
     public CharacterStats Clone()
     {
         return new CharacterStats

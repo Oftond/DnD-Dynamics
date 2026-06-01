@@ -152,11 +152,7 @@ namespace DnD_Dynamics.Models
             return totalWeight;
         }
 
-        private int CalculateCarryingCapacity()
-        {
-            if (_character == null) return 150;
-            return _character.TotalStats.Strength * 15;
-        }
+        private int CalculateCarryingCapacity() => (_character?.BaseStats.Strength ?? 10) * 15;
 
         public bool IsOverEncumbered() => TotalWeight > CarryingCapacity;
         public bool CanCarryMore() => TotalWeight < CarryingCapacity;

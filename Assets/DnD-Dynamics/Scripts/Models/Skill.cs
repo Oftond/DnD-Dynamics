@@ -22,11 +22,10 @@ public class Skill
 
     public string GetDescription() => _data?.Description ?? string.Empty;
 
-    public int CalculateBonus(CharacterData character)
+    public int CalculateBonus(CharacterStats totalStats, int proficiencyBonus)
     {
         var ability = GetAssociatedAbility();
-        var modifier = character.TotalStats.GetModifier(ability);
-        var proficiencyBonus = character.ProficiencyBonus;
+        var modifier = totalStats.GetModifier(ability);
 
         if (IsExpert)
             return modifier + proficiencyBonus * 2;
