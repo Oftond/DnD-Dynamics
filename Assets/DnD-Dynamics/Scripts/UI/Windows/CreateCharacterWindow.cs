@@ -95,6 +95,7 @@ namespace DnD_Dynamics.UI.Windows
         public void SetPresenter(CreateCharacterPresenter presenter)
         {
             _presenter = presenter;
+            _presenter.SetView(this);
         }
 
         public async Task Show()

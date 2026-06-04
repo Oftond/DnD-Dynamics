@@ -51,6 +51,7 @@ namespace DnD_Dynamics.UI
             if (_characterListWindow != null)
             {
                 _characterListWindow.SetPresenter(_characterListPresenter);
+                //_characterListPresenter.SetView(_characterListWindow);
                 _characterListWindow.OnBackClicked += ShowMainMenu;
                 _characterListWindow.OnCreateClicked += ShowCreateCharacter;
                 _characterListWindow.OnCharacterSelected += OnCharacterSelected;
@@ -59,6 +60,7 @@ namespace DnD_Dynamics.UI
             if (_characterDetailWindow != null)
             {
                 _characterDetailWindow.SetPresenter(_characterDetailPresenter);
+                //_characterDetailPresenter.SetView(_characterDetailWindow);
                 _characterDetailWindow.OnBackClicked += ShowCharacterListHandler;
                 _characterDetailWindow.OnDamageClicked += async amount => await _characterDetailPresenter.ApplyDamageAsync(amount);
                 _characterDetailWindow.OnHealClicked += async amount => await _characterDetailPresenter.ApplyHealAsync(amount);
@@ -74,6 +76,7 @@ namespace DnD_Dynamics.UI
             if (_createCharacterWindow != null)
             {
                 _createCharacterWindow.SetPresenter(_createCharacterPresenter);
+                //_createCharacterPresenter.SetView(_createCharacterWindow);
                 _createCharacterWindow.OnCancelClicked += ShowCharacterListHandler;
                 _createCharacterWindow.OnCreateClicked += OnCreateCharacter;
             }
@@ -104,12 +107,14 @@ namespace DnD_Dynamics.UI
         public async Task ShowCharacterList()
         {
             HideAllWindows();
+
             await _characterListWindow?.Show();
         }
 
         private async void ShowCharacterListHandler()
         {
             HideAllWindows();
+
             await _characterListWindow?.Show();
         }
 

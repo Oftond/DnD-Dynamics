@@ -18,7 +18,7 @@ public class CharacterListPresenter : BaseCharacterPresenter
 
     public void SetView(ICharacterListView view)
     {
-        _view = view;
+        _view = view ?? throw new ArgumentNullException(nameof(view));
     }
 
     public List<CharacterUIData> GetAllCharacters() => _model.GetAllCharacters();

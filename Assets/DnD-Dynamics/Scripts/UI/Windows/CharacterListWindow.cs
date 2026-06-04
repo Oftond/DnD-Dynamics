@@ -45,7 +45,7 @@ public class CharacterListWindow : MonoBehaviour, ICharacterListView
     public void SetPresenter(CharacterListPresenter presenter)
     {
         _presenter = presenter;
-        //_presenter.SetView(this);
+        _presenter.SetView(this);
     }
 
     public async Task RefreshCharacters()
@@ -72,9 +72,7 @@ public class CharacterListWindow : MonoBehaviour, ICharacterListView
 
         var characters = _presenter.GetAllCharacters();
 
-        UpdateCharacterList(characters);
-
-        ShowEmptyState(characters.Count == 0);
+        DisplayCharacters(characters);
 
         ShowLoading(false);
         _isRefreshing = false;
@@ -105,6 +103,8 @@ public class CharacterListWindow : MonoBehaviour, ICharacterListView
 
         foreach (var character in characters)
             AddCharacterItem(character);
+
+        Debug.Log($"Characters displayed: {_characterItems.Count} characters");
     }
 
     public void DisplayCharacterDetails(CharacterUIData character)
@@ -153,14 +153,10 @@ public class CharacterListWindow : MonoBehaviour, ICharacterListView
 
     private void ClearCharacters()
     {
-        print(_characterItems.Count);
         foreach (var item in _characterItems.Values)
         {
             if (item != null)
-            {
                 Destroy(item.gameObject);
-                print("УДАЛЕНИЕ!!!!");
-            }
         }
 
         _characterItems.Clear();
@@ -175,18 +171,5 @@ public class CharacterListWindow : MonoBehaviour, ICharacterListView
             emptyStateText.text = "У вас пока нет персонажей.\nНажмите кнопку 'Создать' чтобы начать";
         else if (emptyStateText != null && !show)
             emptyStateText.text = "";
-    }
-
-    private void UpdateCharacterList(List<CharacterUIData> characters)
-    {
-        foreach (var item in _characterItems.Values)
-            Destroy(item);
-
-        _characterItems.Clear();
-
-        foreach (var character in characters)
-            AddCharacterItem(character);
-
-        Debug.Log($"Character list updated: {characters.Count} characters");
     }
 }
