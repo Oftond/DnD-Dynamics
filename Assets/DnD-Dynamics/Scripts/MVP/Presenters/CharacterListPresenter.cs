@@ -10,6 +10,8 @@ public class CharacterListPresenter : BaseCharacterPresenter
 {
     private ICharacterListView _view;
 
+    public event Action<string> OnCharacterSelected;
+
     [Inject]
     public CharacterListPresenter(CharacterModel model, IDataService dataService) : base(model, dataService)
     {
@@ -41,19 +43,6 @@ public class CharacterListPresenter : BaseCharacterPresenter
         {
             _view.ShowLoading(false);
         }
-    }
-
-    public void SelectCharacter(string characterId)
-    {
-        if (string.IsNullOrEmpty(characterId) || _view == null)
-            return;
-
-        var character = _model.GetCharacter(characterId);
-
-        if (character != null)
-            _view.DisplayCharacterDetails(character);
-        else
-            _view.ShowError("Персонаж не найден");
     }
 
     private void OnCharactersChanged(List<CharacterUIData> characters) => _view?.DisplayCharacters(characters);

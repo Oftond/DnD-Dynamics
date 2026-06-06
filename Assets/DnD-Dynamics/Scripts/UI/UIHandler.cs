@@ -84,11 +84,11 @@ namespace DnD_Dynamics.UI
 
         private void OnCharacterSelected(string characterId)
         {
-            _characterListPresenter.SelectCharacter(characterId);
-
             _characterDetailPresenter.SelectCharacter(characterId);
 
             ShowCharacterDetail();
+
+            Debug.Log($"[UIHandler] OnCharacterSelected: {characterId}");
         }
 
         private async void OnCreateCharacter(string name, string raceId, string classId, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma)

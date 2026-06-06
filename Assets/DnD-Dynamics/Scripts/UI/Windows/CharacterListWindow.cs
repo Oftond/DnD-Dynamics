@@ -107,11 +107,6 @@ public class CharacterListWindow : MonoBehaviour, ICharacterListView
         Debug.Log($"Characters displayed: {_characterItems.Count} characters");
     }
 
-    public void DisplayCharacterDetails(CharacterUIData character)
-    {
-        OnCharacterSelected?.Invoke(character.Id);
-    }
-
     public void ShowError(string message)
     {
         Debug.LogError($"Error: {message}");
