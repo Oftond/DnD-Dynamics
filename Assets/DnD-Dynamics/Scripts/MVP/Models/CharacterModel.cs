@@ -25,8 +25,7 @@ namespace DnD_Dynamics.MVP.Model
         public event Action<CharacterUIData> OnCharacterUpdated;
 
         [Inject]
-        public CharacterModel(IDataService dataService, ICharacterStatCalculator statCalculator,
-                              ICharacterCombatService combatService, ICharacterUiMapper uiMapper)
+        public CharacterModel(IDataService dataService, ICharacterStatCalculator statCalculator, ICharacterCombatService combatService, ICharacterUiMapper uiMapper)
         {
             _dataService = dataService;
             _statCalculator = statCalculator;

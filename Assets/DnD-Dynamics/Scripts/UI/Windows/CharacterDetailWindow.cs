@@ -2,6 +2,7 @@ using DnD_Dynamics.MVP.Presenter;
 using DnD_Dynamics.MVP.View;
 using System;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -53,7 +54,6 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
     [SerializeField] private GameObject _loadingSpinner;
 
     private CharacterDetailPresenter _presenter;
-    private CharacterUIData _currentCharacter;
 
     public event Action OnBackClicked;
     public event Action<int> OnDamageClicked;
@@ -116,7 +116,6 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
 
     public void DisplayCharacterDetails(CharacterUIData character)
     {
-        _currentCharacter = character;
         UpdateUI();
     }
 
@@ -208,6 +207,49 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
 
         if (notesText != null)
             notesText.text = string.IsNullOrEmpty(character.Notes) ? "Нет заметок" : character.Notes;
+    }
+
+    private void OnLoadPortraitClicked()
+    {
+        //#if UNITY_STANDALONE || UNITY_EDITOR
+        //        var path = UnityEditor.EditorUtility.OpenFilePanel(
+        //            "Выберите изображение портрета",
+        //            "",
+        //            "png,jpg,jpeg"
+        //        );
+
+        //        if (!string.IsNullOrEmpty(path))
+        //        {
+        //            StartCoroutine(LoadPortraitFromPath(path));
+        //        }
+        //#endif
+
+        //bool permission = NativeGallery.CheckPermission();
+
+        //if (permission == NativeGallery.Permission.Denied)
+        //{
+        //    Debug.LogWarning("[Portrait] Доступ к галерее запрещён пользователем");
+        //    ShowError("Доступ к галерее запрещён. Разрешите доступ в настройках.");
+        //    return;
+        //}
+
+        //if (permission == NativeGallery.Permission.ShouldAsk)
+        //{
+        //    NativeGallery.Permission permissionRequest = NativeGallery.RequestPermission();
+        //    if (permissionRequest == NativeGallery.Permission.Denied)
+        //    {
+        //        ShowError("Доступ к галерее запрещён.");
+        //        return;
+        //    }
+        //}
+
+        //// Открываем галерею
+        //NativeGallery.GetImageFromGallery(
+        //    callback: (path) => OnImagePickedFromGallery(path),
+        //    title: "Выберите портрет",
+        //    mime: "image/*",
+        //    maxSize: maxTextureSize
+        //);
     }
 
     private void ClearUI()
