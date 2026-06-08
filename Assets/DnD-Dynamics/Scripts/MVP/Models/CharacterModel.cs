@@ -157,5 +157,16 @@ namespace DnD_Dynamics.MVP.Model
             var uiData = GetCharacter(characterId);
             if (uiData != null) OnCharacterUpdated?.Invoke(uiData);
         }
+
+        public async Task UpdatePortraitPathAsync(string characterId, string path)
+        {
+            var character = GetRawCharacter(characterId);
+            if (character != null)
+            {
+                character.PortraitPath = path;
+                character.UpdatedAt = DateTime.Now;
+                await UpdateCharacterAsync(character);
+            }
+        }
     }
 }

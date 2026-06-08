@@ -115,6 +115,13 @@ public class CharacterDetailPresenter : BaseCharacterPresenter
         }
     }
 
+    public async Task UpdatePortraitPathAsync(string path)
+    {
+        if (!ValidateCharacterSelection()) return;
+
+        await _model.UpdatePortraitPathAsync(_selectedCharacter.Id, path);
+    }
+
     public void Dispose()
     {
         if (_model != null)
