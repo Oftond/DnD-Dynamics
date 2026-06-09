@@ -10,14 +10,21 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using Zenject;
 
 public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
 {
+    [Inject] private IPortraitDataService _portraitDataService;
+
     [Header("Basic Info")]
     [SerializeField] private TextMeshProUGUI characterNameText;
     [SerializeField] private TextMeshProUGUI classRaceText;
     [SerializeField] private TextMeshProUGUI levelText;
+
+    [Header("Portrait Info")]
     [SerializeField] private Image portraitImage;
+    [SerializeField] private Sprite _defaultPortraitSprite;
+    [SerializeField] private Button _changePortraitButton;
 
     [Header("Health")]
     [SerializeField] private TextMeshProUGUI hpText;
@@ -61,10 +68,9 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
     [Header("Portrait Settings")]
     [SerializeField] private int _maxTextureSize = 512;
     [SerializeField] private string _portraitsFolder = "Portraits";
-    [SerializeField] private Button _changePortraitButton;
 
     private CharacterDetailPresenter _presenter;
-    private string _currentCharacterId;
+    private string _selectedCharacterId;
 
     private Dictionary<string, Texture2D> _textureCache = new Dictionary<string, Texture2D>();
 
@@ -82,19 +88,16 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
         damageButton?.onClick.AddListener(() =>
         {
             OnDamageClicked?.Invoke(GetDamageHealAmount());
-            UpdateUI();
         });
 
         healButton?.onClick.AddListener(() =>
         {
             OnHealClicked?.Invoke(GetDamageHealAmount());
-            UpdateUI();
         });
 
         levelUpButton?.onClick.AddListener(() =>
         {
             OnLevelUpClicked?.Invoke();
-            UpdateUI();
         });
 
         deleteButton?.onClick.AddListener(() => OnDeleteClicked?.Invoke());
@@ -105,8 +108,17 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
 
         _changePortraitButton?.onClick.AddListener(OnLoadPortraitClicked);
 
+        if (_portraitDataService != null)
+            _portraitDataService.OnPortraitLoaded += OnPortraitLoaded;
+
         if (damageHealInput != null)
             damageHealInput.text = "5";
+    }
+
+    private void OnDestroy()
+    {
+        if (_portraitDataService != null)
+            _portraitDataService.OnPortraitLoaded -= OnPortraitLoaded;
     }
 
     public void SetPresenter(CharacterDetailPresenter presenter)
@@ -127,7 +139,17 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
 
     public void DisplayCharacterDetails(CharacterUIData character)
     {
-        UpdateUI();
+        if (character == null)
+        {
+            Debug.LogError("Error of the selected character", this);
+            return;
+        }
+
+        _selectedCharacterId = character.Id;
+
+        LoadPortrait(character.PortraitPath);
+
+        UpdateUI(character);
     }
 
     public void ShowError(string message)
@@ -153,21 +175,13 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
         ClearUI();
     }
 
-    private void UpdateUI()
+    private void UpdateUI(CharacterUIData character)
     {
         if (_presenter == null) return;
 
-        var character = _presenter.GetSelectedCharacter();
+        //var character = _presenter.GetSelectedCharacter();
 
-        if (character == null)
-        {
-            Debug.LogError("Error of the selected character", this);
-            return;
-        }
-
-        _currentCharacterId = character.Id;
-
-        StartCoroutine(LoadTextureFromPath(character.PortraitPath));
+        //StartCoroutine(LoadTextureFromPath(character.PortraitPath));
 
         if (characterNameText != null)
             characterNameText.text = character.Name;
@@ -230,23 +244,6 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
             notesText.text = string.IsNullOrEmpty(character.Notes) ? "Нет заметок" : character.Notes;
     }
 
-    private async void OnLoadPortraitClicked()
-    {
-        if (string.IsNullOrEmpty(_currentCharacterId))
-        {
-            Debug.LogWarning("[Portrait] Персонаж не выбран");
-            return;
-        }
-
-#if UNITY_ANDROID || UNITY_IOS
-        await LoadPortraitForMobile();
-#elif UNITY_EDITOR || UNITY_STANDALONE
-        LoadPortraitForEditor();
-#else
-        Debug.LogWarning("[Portrait] Платформа не поддерживается для загрузки портрета");
-#endif
-    }
-
     private void ClearUI()
     {
         if (characterNameText != null)
@@ -270,9 +267,59 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
         return 5;
     }
 
+    #region Portrait
+    private void OnPortraitLoaded(string path, Texture2D texture)
+    {
+        var character = _presenter?.GetSelectedCharacter();
 
+        if (character != null && character.PortraitPath == path)
+            ApplyTextureToImage(texture);
+    }
 
+    private void LoadPortrait(string portraitPath)
+    {
+        if (portraitImage == null) return;
 
+        if (string.IsNullOrEmpty(portraitPath) || !File.Exists(portraitPath))
+        {
+            portraitImage.sprite = _defaultPortraitSprite;
+            return;
+        }
+
+        var texture = _portraitDataService.GetPortrait(portraitPath);
+
+        if (texture != null)
+            ApplyTextureToImage(texture);
+        else
+            portraitImage.sprite = _defaultPortraitSprite;
+    }
+
+    private void ApplyTextureToImage(Texture2D texture)
+    {
+        if (portraitImage == null || texture == null)
+            return;
+
+        var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+
+        portraitImage.sprite = sprite;
+    }
+
+    private async void OnLoadPortraitClicked()
+    {
+        if (string.IsNullOrEmpty(_selectedCharacterId))
+        {
+            Debug.LogWarning("[Portrait] Персонаж не выбран");
+            return;
+        }
+
+#if UNITY_ANDROID || UNITY_IOS
+        await LoadPortraitForMobile();
+#elif UNITY_EDITOR || UNITY_STANDALONE
+        LoadPortraitForEditor();
+#else
+        Debug.LogWarning("[Portrait] Платформа не поддерживается для загрузки портрета");
+#endif
+    }
 
     private void EnsurePortraitsFolderExists()
     {
@@ -344,13 +391,13 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
     private string GetPortraitSavePath(string characterId)
     {
         var folder = Path.Combine(Application.persistentDataPath, _portraitsFolder);
+
         return Path.Combine(folder, $"{characterId}.png");
     }
 
     private IEnumerator CopyAndLoadPortrait(string sourcePath)
     {
-        // 1. Копируем файл в папку приложения
-        string savePath = GetPortraitSavePath(_currentCharacterId);
+        string savePath = GetPortraitSavePath(_selectedCharacterId);
 
         try
         {
@@ -364,15 +411,8 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
             yield break;
         }
 
-        // 2. Загружаем текстуру из сохранённого пути
-        yield return LoadTextureFromPath(savePath);
-
-        // 3. Сохраняем путь в модели (вызываем async метод БЕЗ await)
         if (_presenter != null)
-        {
-            // Вызываем fire-and-forget, но с обработкой ошибок
             _ = SavePortraitPathAsync(savePath);
-        }
     }
 
     private async Task SavePortraitPathAsync(string path)
@@ -388,85 +428,5 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
             ShowError("Не удалось сохранить путь к портрету");
         }
     }
-
-    private IEnumerator LoadTextureFromPath(string path)
-    {
-        if (!File.Exists(path))
-        {
-            Debug.LogError($"[Portrait] Файл не найден: {path}");
-            yield break;
-        }
-
-        // Проверяем кэш
-        if (_textureCache.TryGetValue(path, out var cachedTexture))
-        {
-            ApplyTextureToImage(cachedTexture);
-            yield break;
-        }
-
-        // Загружаем через UnityWebRequest
-        string fileUrl = "file://" + path;
-        using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(fileUrl))
-        {
-            yield return uwr.SendWebRequest();
-
-            if (uwr.result == UnityWebRequest.Result.Success)
-            {
-                var texture = DownloadHandlerTexture.GetContent(uwr);
-
-                // Опционально: уменьшаем размер для экономии памяти
-                if (texture.width > _maxTextureSize || texture.height > _maxTextureSize)
-                {
-                    texture = ResizeTexture(texture, _maxTextureSize);
-                }
-
-                _textureCache[path] = texture;
-                ApplyTextureToImage(texture);
-            }
-            else
-            {
-                Debug.LogError($"[Portrait] Ошибка загрузки: {uwr.error}");
-                ShowError("Не удалось загрузить изображение");
-            }
-        }
-    }
-
-    private void ApplyTextureToImage(Texture2D texture)
-    {
-        if (portraitImage == null || texture == null) return;
-
-        var sprite = Sprite.Create(
-            texture,
-            new Rect(0, 0, texture.width, texture.height),
-            new Vector2(0.5f, 0.5f)
-        );
-
-        portraitImage.sprite = sprite;
-    }
-
-    private Texture2D ResizeTexture(Texture2D source, int maxSize)
-    {
-        float ratio = Mathf.Min(
-            (float)maxSize / source.width,
-            (float)maxSize / source.height
-        );
-
-        int newWidth = Mathf.RoundToInt(source.width * ratio);
-        int newHeight = Mathf.RoundToInt(source.height * ratio);
-
-        RenderTexture rt = RenderTexture.GetTemporary(newWidth, newHeight);
-        Graphics.Blit(source, rt);
-
-        RenderTexture previous = RenderTexture.active;
-        RenderTexture.active = rt;
-
-        Texture2D resized = new Texture2D(newWidth, newHeight, TextureFormat.RGBA32, false);
-        resized.ReadPixels(new Rect(0, 0, newWidth, newHeight), 0, 0);
-        resized.Apply();
-
-        RenderTexture.active = previous;
-        RenderTexture.ReleaseTemporary(rt);
-
-        return resized;
-    }
+    #endregion
 }

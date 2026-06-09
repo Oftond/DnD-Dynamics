@@ -152,10 +152,13 @@ namespace DnD_Dynamics.MVP.Model
         }
 
         private void NotifyCharactersChanged() => OnCharactersChanged?.Invoke(GetAllCharacters());
+
         private void NotifyCharacterUpdated(string characterId)
         {
             var uiData = GetCharacter(characterId);
-            if (uiData != null) OnCharacterUpdated?.Invoke(uiData);
+
+            if (uiData != null)
+                OnCharacterUpdated?.Invoke(uiData);
         }
 
         public async Task UpdatePortraitPathAsync(string characterId, string path)

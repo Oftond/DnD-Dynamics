@@ -307,7 +307,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 1
+  m_overflowMode: 3
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
@@ -581,7 +581,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 1
+  m_overflowMode: 3
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
@@ -1107,8 +1107,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64fed3201bbca4347920624a39397cb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterListItemView
+  _portraitImage: {fileID: 1126341470624064599}
   _nameText: {fileID: 2585794427789839122}
   _classRaceText: {fileID: 5513011677192795895}
   _levelText: {fileID: 5568999445388373004}
   _hpText: {fileID: 4193490994724549330}
-  selectButton: {fileID: 4019929640028984588}
+  _selectButton: {fileID: 4019929640028984588}
+  _defaultPortraitSprite: {fileID: -2970063888137303578, guid: d84d2c4e87784f74ead687a9c723cc19, type: 3}

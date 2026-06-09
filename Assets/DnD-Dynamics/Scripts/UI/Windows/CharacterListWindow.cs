@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class CharacterListWindow : MonoBehaviour, ICharacterListView
 {
+    [Inject] private DiContainer _container;
+
     [Header("UI Elements")]
     [SerializeField] private Transform charactersContainer;
     [SerializeField] private GameObject characterItemPrefab;
@@ -135,7 +138,8 @@ public class CharacterListWindow : MonoBehaviour, ICharacterListView
         if (characterItemPrefab == null || charactersContainer == null)
             return;
 
-        var itemObject = Instantiate(characterItemPrefab, charactersContainer);
+        //var itemObject = Instantiate(characterItemPrefab, charactersContainer);
+        var itemObject = _container.InstantiatePrefab(characterItemPrefab, charactersContainer);
         var itemView = itemObject.GetComponent<CharacterListItemView>();
 
         if (itemView != null)
