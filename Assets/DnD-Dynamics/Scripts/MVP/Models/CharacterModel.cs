@@ -12,6 +12,7 @@ namespace DnD_Dynamics.MVP.Model
     public class CharacterModel
     {
         private readonly IDataService _dataService;
+        private readonly ICharacterProgressionService _progressioniService;
         private readonly ICharacterStatCalculator _statCalculator;
         private readonly ICharacterCombatService _combatService;
         private readonly ICharacterUiMapper _uiMapper;
@@ -23,14 +24,18 @@ namespace DnD_Dynamics.MVP.Model
 
         public event Action<List<CharacterUIData>> OnCharactersChanged;
         public event Action<CharacterUIData> OnCharacterUpdated;
+        public event Action<CharacterUIData, int> OnCharacterLeveledUp;
 
         [Inject]
-        public CharacterModel(IDataService dataService, ICharacterStatCalculator statCalculator, ICharacterCombatService combatService, ICharacterUiMapper uiMapper)
+        public CharacterModel(IDataService dataService, ICharacterProgressionService progressioniService, ICharacterStatCalculator statCalculator, ICharacterCombatService combatService, ICharacterUiMapper uiMapper)
         {
             _dataService = dataService;
+            _progressioniService = progressioniService;
             _statCalculator = statCalculator;
             _combatService = combatService;
             _uiMapper = uiMapper;
+
+            _progressioniService.OnLevelUp += OnCharacterLevelUpInternal;
         }
 
         public async Task LoadCharactersAsync()
@@ -146,8 +151,10 @@ namespace DnD_Dynamics.MVP.Model
         {
             _races.TryGetValue(character.RaceId, out var race);
             _classes.TryGetValue(character.ClassId, out var @class);
+
             var totalStats = _statCalculator.CalculateTotalStats(character, race, @class);
             var maxHp = _statCalculator.CalculateMaxHp(character, @class);
+
             return _uiMapper.MapToUi(character, totalStats, maxHp, race, @class);
         }
 
@@ -168,6 +175,41 @@ namespace DnD_Dynamics.MVP.Model
             {
                 character.PortraitPath = path;
                 character.UpdatedAt = DateTime.Now;
+                await UpdateCharacterAsync(character);
+            }
+        }
+
+        private void OnCharacterLevelUpInternal((CharacterData character, int oldLevel, int newLevel) d)
+        {
+            Debug.Log($"[CharacterModel] Персонаж {d.character.Name} достиг {d.newLevel} уровня!");
+
+            var uiData = GetCharacter(d.character.Id);
+
+            if (uiData != null)
+                OnCharacterLeveledUp?.Invoke(uiData, d.newLevel);
+        }
+
+        public async Task ChangeXPAsync(string characterId, int amount)
+        {
+            var character = GetRawCharacter(characterId);
+            if (character != null)
+                return;
+
+            _progressioniService.TryAddExperience(character, amount);
+
+            await UpdateCharacterAsync(character);
+        }
+
+        public async Task UpdateACSettingsAsync(string characterId, int baseAC, int shieldBonus, int acBonus, bool isShieldActive)
+        {
+            var character = GetRawCharacter(characterId);
+            if (character != null)
+            {
+                character.ArmorClass = baseAC;
+                character.ShieldBonus = shieldBonus;
+                character.ArmorClassBonus = acBonus;
+                character.IsShieldActive = isShieldActive;
+
                 await UpdateCharacterAsync(character);
             }
         }

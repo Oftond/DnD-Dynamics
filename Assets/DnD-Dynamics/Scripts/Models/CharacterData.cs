@@ -60,13 +60,18 @@ public class CharacterData
 
     public int CurrentHp { get; set; }
     public int TemporaryHp { get; set; }
-    public int ArmorClass { get; set; }
-    public int ShieldBonus { get; set; }
-    public bool IsShieldActive {  get; set; }
+    public int ArmorClass { get; set; } = 10;
+    public int ShieldBonus { get; set; } = 0;
+    public bool IsShieldActive { get; set; } = false;
+    public int ArmorClassBonus { get; set; } = 0;
 
-    public int TotalArmorClass => ArmorClass + (IsShieldActive ? ShieldBonus : 0);
+    public int TotalArmorClass => ArmorClass + ArmorClassBonus + (IsShieldActive ? ShieldBonus : 0);
 
-    public bool HasInspiration {  get; set; }
+    public int SpeedBonus { get; set; } = 0;
+
+    public int InitiativeBonus { get; set; } = 0;
+
+    public bool HasInspiration { get; set; } = false;
 
     public string PortraitPath { get; set; } = string.Empty;
     public string Backstory { get; set; } = string.Empty;
@@ -97,21 +102,37 @@ public class CharacterUIData
     public string Name;
     public string ClassName;
     public string RaceName;
-    public int Level;
+
     public int CurrentHp;
     public int MaxHp;
-    public int ArmorClass;
+
+    public int Level;
+    public int ExperiencePoints;
+    public int ExperienceToNextLevel;
+
     public int BaseArmorClass;
+    public int ArmorClassBonus;
     public int ShieldBonus;
+    public int TotalArmorClass;
     public bool IsShieldActive;
-    public bool HasInspiration;
+
+    public int BaseSpeed;
+    public int SpeedBonus;
+    public int TotalSpeed;
+
+    public int InitiativeBase;
     public int InitiativeBonus;
+    public int TotalInitiative;
+
+    public bool HasInspiration;
+
     public int Strength;
     public int Dexterity;
     public int Constitution;
     public int Intelligence;
     public int Wisdom;
     public int Charisma;
+
     public int StrengthModifier;
     public int DexterityModifier;
     public int ConstitutionModifier;
@@ -119,16 +140,23 @@ public class CharacterUIData
     public int WisdomModifier;
     public int CharismaModifier;
     public int ProficiencyBonus;
+
     public int Gold;
     public int Silver;
     public int Copper;
+
     public string PortraitPath;
     public string Backstory;
     public string Notes;
 
-    public string HpText => $"{CurrentHp}/{MaxHp}";
-    public string LevelText => $"Ур. {Level}";
     public string ClassRaceText => $"{ClassName} - {RaceName}";
+    public string HpText => $"{CurrentHp} / {MaxHp}";
+
+    public string LevelText => $"Ур. {Level}";
+    public string ExperienceText => $"{ExperiencePoints} / {ExperienceToNextLevel}";
+
+    public string SpeedText => $"{TotalSpeed} фт.";
+    public string SpeedBonusText => SpeedBonus != 0 ? $" ({SpeedBonus:+0;-0;0})" : "";
 
     public string StrengthText => $"{Strength} ({StrengthModifier:+0;-0;0})";
     public string DexterityText => $"{Dexterity} ({DexterityModifier:+0;-0;0})";
@@ -137,7 +165,20 @@ public class CharacterUIData
     public string WisdomText => $"{Wisdom} ({WisdomModifier:+0;-0;0})";
     public string CharismaText => $"{Charisma} ({CharismaModifier:+0;-0;0})";
 
-    public string ArmorClassText => $"КД: {ArmorClass}";
-    public string InitiativeText => $"Инициатива: {InitiativeBonus:+0;-0;0}";
-    public string ProficiencyText => $"Бонус умения: +{ProficiencyBonus}";
+    public string ArmorClassText => $"{TotalArmorClass}";
+
+    public string InitiativeText => $"<b>{TotalInitiative:+0;-0;0}</b>\n<size=16>Инициатива</size>";
+    public string ProficiencyText => $"<b>+{ProficiencyBonus}</b>\n<size=16>Бонус умения</size>";
+}
+
+[Serializable]
+public class SkillUIData
+{
+    public string Id;
+    public string Name;
+    public CharacterAbility AssociatedAbility;
+    public bool IsProficient;
+    public bool IsExpert;
+    public int TotalBonus;
+    public string BonusText => $"{TotalBonus:+0;-0;0}";
 }

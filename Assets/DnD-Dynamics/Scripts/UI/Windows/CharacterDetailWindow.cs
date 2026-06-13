@@ -1,6 +1,7 @@
 using DnD_Dynamics.MVP.Presenter;
 using DnD_Dynamics.MVP.View;
 using System;
+using System.Buffers.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -20,6 +21,16 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
     [SerializeField] private TextMeshProUGUI characterNameText;
     [SerializeField] private TextMeshProUGUI classRaceText;
     [SerializeField] private TextMeshProUGUI levelText;
+
+    [Header("Speed Info")]
+    [SerializeField] private TextMeshProUGUI _speedText;
+
+    [Header("Experience")]
+    [SerializeField] private TextMeshProUGUI _xpText;
+    [SerializeField] private Button _changeXP;
+
+    [Header("Initiative")]
+    [SerializeField] private TextMeshProUGUI _initiativeText;
 
     [Header("Portrait Info")]
     [SerializeField] private Image portraitImage;
@@ -44,7 +55,7 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
 
     [Header("Combat")]
     [SerializeField] private TextMeshProUGUI armorClassText;
-    [SerializeField] private TextMeshProUGUI initiativeText;
+    [SerializeField] private Button _buttonArmorClass;
     [SerializeField] private TextMeshProUGUI proficiencyText;
 
     [Header("Wealth")]
@@ -62,6 +73,12 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
     [SerializeField] private Button editButton;
     [SerializeField] private Button backButton;
 
+    [Header("Popups")]
+    [SerializeField] private XPPopup _xpPopup;
+    [SerializeField] private ArmorClassPopup _armorClassPopup;
+    [SerializeField] private NotificationPopup _notificationPopup;
+    [SerializeField] private LoadingOverlay _loadingOverlay;
+
     [Header("Loading")]
     [SerializeField] private GameObject _loadingSpinner;
 
@@ -72,7 +89,9 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
     private CharacterDetailPresenter _presenter;
     private string _selectedCharacterId;
 
-    private Dictionary<string, Texture2D> _textureCache = new Dictionary<string, Texture2D>();
+    public event Action<int> OnXPChangeRequested;
+    public event Action OnLevelUpFromPopupRequested;
+    public event Action<(int baseAC, int shieldBonus, int acBonus, bool isShieldActive)> OnACSettingsChanged;
 
     public event Action OnBackClicked;
     public event Action<int> OnDamageClicked;
@@ -113,6 +132,21 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
 
         if (damageHealInput != null)
             damageHealInput.text = "5";
+
+        _buttonArmorClass?.onClick.AddListener(OnArmorClassButtonClicked);
+
+        _changeXP?.onClick.AddListener(OnXPButtonClicked);
+
+        if (_xpPopup != null)
+        {
+            _xpPopup.OnXPChanged += (amount) => OnXPChangeRequested?.Invoke(amount);
+            _xpPopup.OnLevelUpRequested += () => OnLevelUpFromPopupRequested?.Invoke();
+        }
+
+        if (_armorClassPopup != null)
+        {
+            _armorClassPopup.OnACSettingsChanged += (s) => OnACSettingsChanged?.Invoke(s);
+        }
     }
 
     private void OnDestroy()
@@ -137,6 +171,16 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
         gameObject.SetActive(false);
     }
 
+    private void OnXPButtonClicked()
+    {
+        var character = _presenter?.GetSelectedCharacter();
+        if (character == null) return;
+
+        _xpPopup.Setup(character.Level, character.ExperiencePoints);
+
+        _xpPopup.Open();
+    }
+
     public void DisplayCharacterDetails(CharacterUIData character)
     {
         if (character == null)
@@ -155,19 +199,23 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
     public void ShowError(string message)
     {
         Debug.LogError($"Error: {message}");
-        //Показать UI уведомление
+
+        _notificationPopup?.ShowError(message);
     }
 
     public void ShowSuccess(string message)
     {
         Debug.Log($"Success: {message}");
-        //Показать UI уведомление
+
+        _notificationPopup?.ShowSuccess(message);
     }
 
     public void ShowLoading(bool show)
     {
-        if (_loadingSpinner != null)
-            _loadingSpinner.SetActive(show);
+        if (show)
+            _loadingOverlay?.Show();
+        else
+            _loadingOverlay?.Hide();
     }
 
     public void ClearSelection()
@@ -179,9 +227,8 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
     {
         if (_presenter == null) return;
 
-        //var character = _presenter.GetSelectedCharacter();
-
-        //StartCoroutine(LoadTextureFromPath(character.PortraitPath));
+        if (_speedText != null)
+            _speedText.text = $"{character.BaseSpeed} фт.";
 
         if (characterNameText != null)
             characterNameText.text = character.Name;
@@ -192,14 +239,14 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
         if (levelText != null)
             levelText.text = character.LevelText;
 
+        if (_xpText != null)
+            _xpText.text = character.ExperienceText;
+
         if (hpText != null)
-            hpText.text = $"{character.CurrentHp} / {character.MaxHp}";
+            hpText.text = character.HpText;
 
-        if (hpFractionText != null)
-            hpFractionText.text = $"{character.CurrentHp}/{character.MaxHp}";
-
-        if (hpSlider != null)
-            hpSlider.value = (float)character.CurrentHp / character.MaxHp;
+        //if (hpSlider != null)
+        //    hpSlider.value = (float)character.CurrentHp / character.MaxHp;
 
         if (strengthText != null)
             strengthText.text = $"Сила: {character.StrengthText}";
@@ -222,8 +269,8 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
         if (armorClassText != null)
             armorClassText.text = character.ArmorClassText;
 
-        if (initiativeText != null)
-            initiativeText.text = character.InitiativeText;
+        if (_initiativeText != null)
+            _initiativeText.text = character.InitiativeText;
 
         if (proficiencyText != null)
             proficiencyText.text = character.ProficiencyText;
@@ -257,6 +304,25 @@ public class CharacterDetailWindow : MonoBehaviour, ICharacterDetailView
 
         if (hpSlider != null)
             hpSlider.value = 0;
+    }
+
+    private void OnArmorClassButtonClicked()
+    {
+        Debug.Log("Open armor class edit dialog");
+
+        var character = _presenter?.GetSelectedCharacter();
+
+        if (character == null)
+            return;
+
+        _armorClassPopup.Setup(
+            character.BaseArmorClass,
+            character.ShieldBonus,
+            character.ArmorClassBonus,
+            character.IsShieldActive
+        );
+
+        _armorClassPopup.Open();
     }
 
     private int GetDamageHealAmount()

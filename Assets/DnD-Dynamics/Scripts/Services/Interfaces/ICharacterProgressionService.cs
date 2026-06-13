@@ -3,8 +3,8 @@ using UnityEngine;
 
 public interface ICharacterProgressionService
 {
-    event Action<CharacterData, int> OnLevelUp;
+    event Action<(CharacterData character, int oldLevel, int newLevel)> OnLevelUp;
 
-    bool AddExperience(CharacterData character, int amount);
+    bool TryAddExperience(CharacterData character, int amount);
     bool CanLevelUp(CharacterData character);
 }

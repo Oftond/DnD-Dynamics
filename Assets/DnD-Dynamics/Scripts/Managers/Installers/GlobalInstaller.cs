@@ -51,6 +51,8 @@ public class GlobalInstaller : MonoInstaller
         Container.Bind<ICharacterUiMapper>().To<CharacterUiMapper>().AsSingle();
 
         Container.Bind<IPortraitDataService>().To<PortraitDataService>().AsSingle();
+
+        Container.Bind<ICharacterProgressionService>().To<CharacterProgressionService>().AsSingle();
     }
 
     private void PresentersInstall()

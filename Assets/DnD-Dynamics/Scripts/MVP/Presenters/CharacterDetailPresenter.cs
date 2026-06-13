@@ -15,6 +15,13 @@ public class CharacterDetailPresenter : BaseCharacterPresenter
     public CharacterDetailPresenter(CharacterModel model, IDataService dataService) : base(model, dataService)
     {
         _model.OnCharacterUpdated += OnCharacterUpdated;
+
+        if (_view is CharacterDetailWindow window)
+        {
+            window.OnXPChangeRequested += async (amount) => await ChangeXPAsync(amount);
+            window.OnLevelUpFromPopupRequested += async () => await LevelUpAsync();
+            window.OnACSettingsChanged += async (s) => await UpdateACSettingsAsync(s.baseAC, s.shieldBonus, s.acBonus, s.isShieldActive);
+        }
     }
 
     public void SetView(ICharacterDetailView view)
@@ -120,6 +127,26 @@ public class CharacterDetailPresenter : BaseCharacterPresenter
         if (!ValidateCharacterSelection()) return;
 
         await _model.UpdatePortraitPathAsync(_selectedCharacter.Id, path);
+    }
+
+    public async Task ChangeXPAsync(int amount)
+    {
+        if (!ValidateCharacterSelection()) return;
+
+        await _model.ChangeXPAsync(_selectedCharacter.Id, amount);
+
+        if (amount > 0)
+            _view?.ShowSuccess($"Добавлено {amount} опыта");
+        else
+            _view?.ShowSuccess($"Отнято {-amount} опыта");
+    }
+
+    public async Task UpdateACSettingsAsync(int baseAC, int shieldBonus, int acBonus, bool isShieldActive)
+    {
+        if (!ValidateCharacterSelection()) return;
+
+        await _model.UpdateACSettingsAsync(_selectedCharacter.Id, baseAC, shieldBonus, acBonus, isShieldActive);
+        _view?.ShowSuccess("Настройки КД обновлены");
     }
 
     public void Dispose()

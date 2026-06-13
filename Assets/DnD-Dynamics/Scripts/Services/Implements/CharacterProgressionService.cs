@@ -3,52 +3,37 @@ using UnityEngine;
 
 public class CharacterProgressionService : ICharacterProgressionService
 {
-    public event Action<CharacterData, int> OnLevelUp;
+    public event Action<(CharacterData character, int oldLevel, int newLevel)> OnLevelUp;
 
-    public bool AddExperience(CharacterData character, int amount)
+    public bool TryAddExperience(CharacterData character, int amount)
     {
-        character.ExperiencePoints += amount;
+        if (character == null)
+        {
+            Debug.LogError("[CharacterProgressionService] Персонаж null");
+            return false;
+        }
+
+        character.ExperiencePoints += Math.Max(0, amount);
         bool leveledUp = false;
 
-        var expForNext = CalculateExpForLevel(character.Level + 1);
+        var expForNext = ExperienceTable.GetExperienceForLevel(character.Level + 1);
         while (character.ExperiencePoints >= expForNext && character.Level < 20)
         {
             character.Level++;
             character.UpdatedAt = DateTime.Now;
-            OnLevelUp?.Invoke(character, character.Level);
+            OnLevelUp?.Invoke((character, character.Level - 1, character.Level));
             leveledUp = true;
-            expForNext = CalculateExpForLevel(character.Level + 1);
+            expForNext = ExperienceTable.GetExperienceForLevel(character.Level + 1);
         }
 
         return leveledUp;
     }
 
-    public bool CanLevelUp(CharacterData character) => character.ExperiencePoints >= CalculateExpForLevel(character.Level + 1) && character.Level < 20;
-
-    private int CalculateExpForLevel(int level)
+    public bool CanLevelUp(CharacterData character)
     {
-        return level switch
-        {
-            2 => 300,
-            3 => 900,
-            4 => 2700,
-            5 => 6500,
-            6 => 14000,
-            7 => 23000,
-            8 => 34000,
-            9 => 48000,
-            10 => 64000,
-            11 => 85000,
-            12 => 100000,
-            13 => 120000,
-            14 => 140000,
-            15 => 165000,
-            16 => 195000,
-            17 => 225000,
-            18 => 265000,
-            19 => 305000,
-            20 => 355000,
-            _ => int.MaxValue
-        };
+        if (character == null)
+            return false;
+
+        return character.ExperiencePoints >= ExperienceTable.GetExperienceForLevel(character.Level + 1) && character.Level < 20;
     }
 }

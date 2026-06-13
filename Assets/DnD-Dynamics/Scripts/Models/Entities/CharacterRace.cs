@@ -5,7 +5,9 @@ using Newtonsoft.Json;
 [Serializable]
 public class CharacterRace : HandbookEntity
 {
-    [JsonProperty("speed")] public int Speed { get; set; } = 30;
+    public const int DefaultSpeed = 30;
+
+    [JsonProperty("speed")] public int Speed { get; set; } = DefaultSpeed;
     [JsonProperty("size")] public string Size { get; set; } = "Medium";
     [JsonProperty("abilityBonuses")] public Dictionary<string, int> AbilityBonuses { get; set; } = new();
     [JsonProperty("languages")] public List<string> Languages { get; set; } = new();
